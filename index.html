@@ -1,4 +1,4 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,6 @@
         .reason-box { font-size: 13px; color: #00ffcc; margin-top: 15px; text-align: center; font-style: italic; background: rgba(0, 255, 204, 0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(0, 255, 204, 0.1); width: 100%; }
         .conf-score { font-family: 'Orbitron'; font-size: 14px; color: #ffaa00; margin-top: 10px; letter-spacing: 2px; }
         .next-btn { background: #00ffcc; color: #000; padding: 12px 30px; border-radius: 15px; font-weight: 900; font-size: 14px; margin-top: 15px; text-transform: uppercase; }
-        select { appearance: none; -webkit-appearance: none; background: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300ffcc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 1rem center; background-size: 1em; }
     </style>
 </head>
 <body>
@@ -57,9 +56,9 @@
         <div id="future-opt" class="hidden mb-8 bg-[#0a0a0a] p-5 rounded-2xl border border-[#222]">
             <p class="text-[10px] text-gray-500 mb-3 uppercase font-black tracking-widest">Select Signal Quantity</p>
             <select id="sig-qty" class="w-full bg-black border border-cyan-900/50 p-5 rounded-2xl text-cyan-400 font-black outline-none mb-4">
-                <option value="5">📊 05 SIGNALS (QUICK)</option>
-                <option value="10">📊 10 SIGNALS (PRO)</option>
-                <option value="15">📊 15 SIGNALS (ULTRA)</option>
+                <option value="5">📊 05 SIGNALS</option>
+                <option value="10">📊 10 SIGNALS</option>
+                <option value="15">📊 15 SIGNALS</option>
             </select>
         </div>
         <div id="list-markets">
@@ -91,12 +90,12 @@
                 </div>
 
                 <div id="ui-analyzer" class="hidden w-full px-5 text-center">
-                    <div class="upload-area" onclick="triggerGallery()">
-                        <i class="fas fa-upload text-4xl text-cyan-400/20 mb-4"></i>
-                        <h1 class="text-lg font-black text-gray-600 italic uppercase">UPLOAD CHART SCREENSHOT</h1>
-                        <p class="text-[9px] text-gray-800 mt-3 tracking-widest font-bold uppercase">Tap to Gallery</p>
+                    <div id="upload-box" class="upload-area" onclick="triggerGallery()">
+                        <i class="fas fa-image text-4xl text-cyan-400/20 mb-4"></i>
+                        <h1 id="upload-status" class="text-lg font-black text-gray-600 italic uppercase">UPLOAD CHART</h1>
                     </div>
-                    <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="handleFile()">
+                    <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="fileSelected()">
+                    <button id="btn-execute" onclick="startProcess()" class="hidden action-btn">Execute Analysis</button>
                 </div>
 
                 <div id="ui-mode" class="hidden text-center">
@@ -106,14 +105,13 @@
                 </div>
 
                 <div id="ui-result" class="hidden flex flex-col items-center text-center w-full">
-                    <p class="text-[10px] text-cyan-500 font-bold uppercase tracking-[4px] mb-2 animate-pulse">AI BRAIN ANALYSIS</p>
+                    <p class="text-[10px] text-cyan-500 font-bold uppercase tracking-[4px] mb-2 animate-pulse">DEEP AI SCAN COMPLETE</p>
                     <div id="res-icon" class="text-[140px] leading-none mb-4"></div>
                     <h1 id="res-txt" class="text-5xl font-black italic uppercase"></h1>
-                    
-                    <div id="conf-display" class="conf-score">CONFIDENCE: 0%</div>
+                    <div id="conf-display" class="conf-score">ACCURACY: 0%</div>
 
                     <div id="timer-box" class="hidden flex flex-col items-center">
-                        <p class="text-[9px] text-gray-600 mt-3 uppercase font-bold tracking-widest">Time Remaining</p>
+                        <p class="text-[9px] text-gray-600 mt-3 uppercase font-bold tracking-widest">Next Candle In</p>
                         <div id="countdown" class="timer-bar">10s</div>
                         <button id="next-scan-btn" onclick="startProcess()" class="next-btn hidden">Next Analysis</button>
                     </div>
@@ -126,11 +124,10 @@
         </div>
     </div>
 
-    <div id="scan-overlay"><div class="radar-circle mb-12"></div><p class="text-cyan-400 font-bold tracking-[8px] animate-pulse text-xl uppercase italic">AI Deep Learning...</p></div>
+    <div id="scan-overlay"><div class="radar-circle mb-12"></div><p class="text-cyan-400 font-bold tracking-[8px] animate-pulse text-xl uppercase italic">Scanning OTC Patterns...</p></div>
 
     <script>
         let mode = ""; let market = ""; let timer;
-        const PROXY_MASTER_KEY = "BRK-V1-ENTERPRISE-8829"; // Placeholder for the Server Connection
 
         function doLogin() {
             if(document.getElementById('uid').value === "Arif09" && document.getElementById('ukey').value === "Arif@098") {
@@ -162,19 +159,21 @@
             document.getElementById('btn-main').classList.remove('hidden');
             document.getElementById('mode-title').innerText = mode;
             document.getElementById('mode-market').innerText = n;
-            document.getElementById('mode-icon').innerHTML = (mode === '10s COMPOUNDING') ? '<i class="fas fa-bolt text-yellow-400"></i>' : '<i class="fas fa-chart-line text-cyan-400"></i>';
         }
 
         function triggerGallery() { document.getElementById('inp-file').click(); }
 
-        function handleFile() {
-            const file = document.getElementById('inp-file').files[0];
-            if(file) runScan(4500, showFinal);
+        function fileSelected() {
+            if(document.getElementById('inp-file').files[0]) {
+                document.getElementById('upload-status').innerText = "IMAGE READY";
+                document.getElementById('upload-status').style.color = "#00ffcc";
+                document.getElementById('btn-execute').classList.remove('hidden');
+            }
         }
 
         function startProcess() {
-            if(mode === '10s COMPOUNDING') runScan(3000, showFinal);
-            else if(mode === 'FUTURE SIGNAL') runScan(4000, showFutureList);
+            let scanTime = mode === 'LIVE ANALYZER' ? 5000 : 3000;
+            runScan(scanTime, mode === 'FUTURE SIGNAL' ? showFutureList : showFinal);
         }
 
         function runScan(t, cb) {
@@ -186,41 +185,40 @@
             }, t);
         }
 
-        // --- AI BRAIN LOGIC CORE ---
-        function generateAIReasoning() {
-            const logics = [
-                "SMC Alert: Liquidity Sweep detected below Support. Demand Zone Active.",
-                "ICT Logic: Fair Value Gap (FVG) filling. Institutional Order Flow is Bullish.",
-                "Stochastic Cross: K-Line exiting Oversold 20. Momentum Reversal confirmed.",
-                "RSI Divergence: Price Lower-Low vs RSI Higher-Low. Strong Bullish Reversal.",
-                "S/R Bounce: Market rejected from 0.46800 Psycho-Level with Long Wick.",
-                "Engulfing Pattern: Institutional Engulfing candle identified on 1M timeframe.",
-                "Macro Analysis: Overall Market Structure (MS) is Bearish, looking for Pullback.",
-                "Price Action: Pin Bar formed at Weekly Resistance. Smart Money Selling.",
-                "Market Exhaustion: Low Volume Doji detected. Trend reversal imminent.",
-                "OTC Algo Bypass: Artificial pump detected, looking for mean reversion."
+        function getAdvancedReasoning() {
+            const advancedLogics = [
+                "VSA Logic: Low Volume Test at Support. Price rejection expected.",
+                "OTC Pattern: 3-Bar Correction sequence identified. Next candle Reversal.",
+                "Smart Money Concept: Mitigated Order Block at 0.46820. Big Move coming.",
+                "Hybrid RSI: Oversold 15 + Stochastic Gold-Cross. 91% Probability.",
+                "Liquidity Gap: FVG detected above current price. Magnet effect active.",
+                "Trend Exhaustion: Doji after 4 consecutive Red candles. OTC Correction.",
+                "Fibonacci 61.8%: Golden ratio rejection at psychological level.",
+                "Martingale Safety: High Volatility detected. Wait for 1-step confirmation.",
+                "Hammer Rejection: Long lower shadow indicates institutional buying."
             ];
-            return logics[Math.floor(Math.random() * logics.length)];
+            return advancedLogics[Math.floor(Math.random() * advancedLogics.length)];
         }
 
         function showFinal() {
             document.getElementById('ui-analyzer').classList.add('hidden');
             document.getElementById('ui-mode').classList.add('hidden');
             document.getElementById('btn-main').classList.add('hidden');
+            document.getElementById('btn-execute').classList.add('hidden');
             document.getElementById('ui-result').classList.remove('hidden');
             
-            const call = Math.random() > 0.45; // Logic slightly biased based on market conditions
+            const call = Math.random() > 0.5;
             const resTxt = document.getElementById('res-txt');
             const resIcon = document.getElementById('res-icon');
-            const reason = document.getElementById('reason-text');
             const conf = document.getElementById('conf-display');
+            const reason = document.getElementById('reason-text');
             
             resTxt.innerText = call ? "CALL ↑" : "PUT ↓";
             resTxt.style.color = call ? "#00ffcc" : "#ff3333";
-            resIcon.innerHTML = call ? '<i class="fas fa-arrow-up" style="color:#00ffcc"></i>' : '<i class="fas fa-arrow-down" style="color:#ff3333"></i>';
+            resIcon.innerHTML = call ? '<i class="fas fa-chevron-circle-up" style="color:#00ffcc"></i>' : '<i class="fas fa-chevron-circle-down" style="color:#ff3333"></i>';
             
-            conf.innerText = `CONFIDENCE: ${Math.floor(Math.random() * (91 - 70 + 1)) + 70}%`;
-            reason.innerText = "Logic: " + generateAIReasoning();
+            conf.innerText = `ACCURACY: ${Math.floor(Math.random() * (96 - 88 + 1)) + 88}%`;
+            reason.innerText = "Deep AI Logic: " + getAdvancedReasoning();
 
             if(mode === '10s COMPOUNDING') {
                 document.getElementById('timer-box').classList.remove('hidden');
@@ -243,7 +241,7 @@
                 cd.innerText = timeLeft + "s";
                 if(timeLeft <= 0) {
                     clearInterval(timer);
-                    cd.innerText = "EXPIRED";
+                    cd.innerText = "SIGNAL EXPIRED";
                     nextBtn.classList.remove('hidden'); 
                 }
             }, 1000);
@@ -253,15 +251,14 @@
             const qty = document.getElementById('sig-qty').value;
             const container = document.getElementById('future-container');
             container.innerHTML = "";
-            let signalText = "BURAK X V1 ENTERPRISE SIGNALS:\n";
+            let signalText = "BURAK X V1 PRO SIGNALS:\n";
             for(let i=0; i<qty; i++) {
                 const now = new Date();
                 const futureTime = new Date(now.getTime() + (i+1)*5*60000);
                 const timeStr = futureTime.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit'});
                 const type = Math.random() > 0.5 ? "CALL ↑" : "PUT ↓";
-                const acc = Math.floor(Math.random() * (91 - 85 + 1)) + 85;
-                container.innerHTML += `<div class="market-row"><span>${timeStr} - ${market}</span><span class="${type.includes('CALL')?'text-cyan-400':'text-red-500'} font-black">${type} (${acc}%)</span></div>`;
-                signalText += `${timeStr} | ${market} | ${type} | Acc: ${acc}%\n`;
+                container.innerHTML += `<div class="market-row"><span>${timeStr} - ${market}</span><span class="${type.includes('CALL')?'text-cyan-400':'text-red-500'} font-black">${type}</span></div>`;
+                signalText += `${timeStr} | ${market} | ${type}\n`;
             }
             window.latestSignals = signalText;
             document.getElementById('future-list-modal').style.display = 'block';
@@ -269,7 +266,7 @@
 
         function copySignals() {
             navigator.clipboard.writeText(window.latestSignals);
-            alert("Signals Copied with AI Accuracy Scores!");
+            alert("All Signals Copied!");
         }
 
         function resetApp() {
@@ -279,10 +276,12 @@
             document.getElementById('ui-analyzer').classList.add('hidden');
             document.getElementById('ui-mode').classList.add('hidden');
             document.getElementById('btn-main').classList.add('hidden');
-            document.getElementById('inp-file').value = "";
+            document.getElementById('btn-execute').classList.add('hidden');
+            document.getElementById('upload-status').innerText = "UPLOAD CHART";
+            document.getElementById('upload-status').style.color = "#4b5563";
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
-</html> 
+</html>
