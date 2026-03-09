@@ -15,6 +15,7 @@
         .action-btn { width: 100%; background: #00ffcc; color: #000; padding: 20px; border-radius: 25px; font-weight: 900; font-size: 18px; text-transform: uppercase; margin-top: 25px; box-shadow: 0 10px 20px rgba(0,255,204,0.2); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10002; padding: 25px; overflow-y: auto; }
         .market-row { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 18px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; transition: 0.3s; }
+        .market-row:active { background: #111; border-color: #00ffcc; }
         #scan-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 20000; flex-direction: column; align-items: center; justify-content: center; }
         .radar-circle { width: 180px; height: 180px; border: 2px solid #004433; border-radius: 50%; position: relative; overflow: hidden; }
         .radar-circle::after { content: ''; position: absolute; width: 50%; height: 50%; background: linear-gradient(45deg, transparent, #00ffcc); transform-origin: bottom right; animation: rotate 1.5s linear infinite; }
@@ -22,7 +23,7 @@
         .reason-box { font-size: 12px; color: #00ffcc; margin-top: 15px; text-align: center; background: rgba(0, 255, 204, 0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(0, 255, 204, 0.1); width: 100%; height: 80px; overflow-y: auto; }
         #side-menu { display: none; position: fixed; inset: 0; width: 80%; background: #080808; z-index: 10001; border-right: 1px solid #1a1a1a; padding: 50px 25px; }
         /* টাইম জোন হাইড করার জন্য স্টাইল */
-        .clock-hidden { display: none !important; }
+        .clock-hidden { display: none; }
     </style>
 </head>
 <body>
@@ -65,23 +66,30 @@
             <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
         </div>
         <div class="space-y-4">
-            <div class="p-4 border-b border-gray-900 font-bold uppercase" onclick="modeSelect('FUTURE SIGNAL')">Future Signal</div>
-            <div class="p-4 border-b border-gray-900 font-bold uppercase" onclick="modeSelect('10s COMPOUNDING')">10s Compound</div>
-            <div class="p-4 border-b border-gray-900 font-bold uppercase" onclick="modeSelect('LIVE ANALYZER')">Live Analyzer</div>
-            <div class="p-4 text-red-500 mt-20" onclick="location.reload()">Logout</div>
+            <div class="p-4 border-b border-gray-900 font-bold uppercase flex items-center" onclick="modeSelect('FUTURE SIGNAL')">
+                <i class="fas fa-chart-line mr-3 text-cyan-400"></i> Future Signal
+            </div>
+            <div class="p-4 border-b border-gray-900 font-bold uppercase flex items-center" onclick="modeSelect('10s COMPOUNDING')">
+                <i class="fas fa-bolt mr-3 text-yellow-400"></i> 10s Compound
+            </div>
+            <div class="p-4 border-b border-gray-900 font-bold uppercase flex items-center" onclick="modeSelect('LIVE ANALYZER')">
+                <i class="fas fa-microscope mr-3 text-purple-400"></i> Live Analyzer
+            </div>
+            <div class="p-4 text-red-500 mt-20 flex items-center" onclick="location.reload()">
+                <i class="fas fa-sign-out-alt mr-3"></i> Logout
+            </div>
         </div>
     </div>
 
     <div id="main-app" class="hidden p-6 flex flex-col h-full">
-        <div class="flex justify-between items-center py-6">
-            <i class="fas fa-th-large text-3xl text-cyan-400" onclick="toggleMenu()"></i>
+        <div class="flex justify-between items-center py-6 relative">
+            <i class="fas fa-th-large text-2xl text-cyan-400" onclick="toggleMenu()"></i>
             
             <div class="flex-grow text-center">
-                <h1 style="font-family: 'Orbitron';" class="text-2xl font-black text-cyan-400 tracking-tighter uppercase">BURAK 亗 JINN</h1>
-                <div id="live-clock" class="clock-hidden">UTC+6 00:00:00</div>
+                <h1 style="font-family: 'Orbitron';" class="text-3xl font-black text-cyan-400 tracking-tighter uppercase">BURAK 亗 JINN</h1>
             </div>
 
-            <div class="w-8"></div>
+            <div id="live-clock" class="clock-hidden"></div>
         </div>
 
         <div class="flex-grow flex flex-col justify-center items-center">
@@ -114,15 +122,16 @@
     <div id="scan-overlay"><div class="radar-circle mb-8"></div><p id="scan-text" class="text-cyan-400 font-bold tracking-[5px] animate-pulse">SYNCING API...</p></div>
 
     <script>
-        // ১. ঘড়ি ব্যাকগ্রাউন্ডে চলবে (UTC+6)
+        // Clock Functionality (Hidden but running in background for system sync)
         function updateClock() {
             const now = new Date();
             const utc6 = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 6));
-            document.getElementById('live-clock').innerText = "UTC+6 " + utc6.toTimeString().split(' ')[0];
+            const clockEl = document.getElementById('live-clock');
+            if(clockEl) clockEl.innerText = "UTC+6 " + utc6.toTimeString().split(' ')[0];
         }
         setInterval(updateClock, 1000);
 
-        // ২. লগইন ও মোড সিলেকশন
+        let currentMode = "";
         function doLogin() {
             if(document.getElementById('uid').value === CONFIG.USERNAME && document.getElementById('ukey').value === CONFIG.PASSWORD) {
                 document.getElementById('login-page').style.display = 'none';
@@ -160,27 +169,25 @@
             }
         }
 
-        // ৩. অ্যাডভান্সড লজিক
         function getAdvancedLogic() {
             const logics = [
-                "SMC/ICT: Liquidity sweep at PDH detected. FVG filling at 0.46800. Strong Put potential.",
-                "Stochastic: K% line crossing D% from Overbought (80) zone. Reversal imminent.",
-                "RSI: Oversold (30) touched. Bullish divergence forming on 1M timeframe.",
+                "SMC/ICT: Liquidity sweep at PDH detected. FVG filling. Strong Put potential.",
+                "Stochastic: K% line crossing D% from Overbought zone. Reversal imminent.",
+                "RSI: Oversold touched. Bullish divergence forming on 1M timeframe.",
                 "S/R Bounce: Price rejected at major Support with a Long Wick Hammer.",
-                "Hybrid Pattern: Bearish Engulfing + Pin Bar detected at Resistance zone.",
-                "Exhaustion: Candle size decreasing at round number level. Momentum loss.",
+                "Hybrid Pattern: Bearish Engulfing + Pin Bar detected at Resistance.",
+                "Exhaustion: Candle size decreasing at round number. Momentum loss.",
                 "Macro Trend: H1 Bullish, M5 Pullback complete. High probability Call.",
                 "Confidence: 4 Indicators matching (VSA+RSI+SMC+Fib). Score: 91%.",
                 "Scalping 1M: Micro-level breakout with high volume confirmation.",
-                "OTC Algo: Artificial spike detected. Mean reversion expected within 3 candles."
+                "OTC Algo: Artificial spike detected. Mean reversion expected."
             ];
             return logics[Math.floor(Math.random() * logics.length)];
         }
 
-        // ৪. এপিআই প্রসেসিং
         async function startProcess() {
             if(CONFIG.GPT_VISION_KEY.includes("YOUR") || CONFIG.PREMIUM_OTC_KEY.includes("YOUR")) {
-                alert("ERROR: API Keys missing!");
+                alert("ERROR: API Keys not found! Please insert keys in the CONFIG script.");
                 return;
             }
             document.getElementById('scan-overlay').style.display = 'flex';
