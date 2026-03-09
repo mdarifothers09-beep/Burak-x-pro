@@ -72,8 +72,18 @@
         </div>
     </div>
 
-    <div id="main-app" class="hidden p-6 flex flex-col h-full">
-        <div class="flex justify-between items-center py-4">
+    <div class="flex justify-between items-center py-4 relative">
+    <i class="fas fa-th-large text-2xl text-cyan-400" onclick="toggleMenu()"></i>
+    
+    <div class="flex-grow text-center">
+        <h1 style="font-family: 'Orbitron';" class="text-xl font-black text-cyan-400 tracking-tighter uppercase">BURAK 亗 JINN</h1>
+    </div>
+    
+    <div class="absolute top-1 right-0">
+        <div class="clock-panel" id="live-clock" style="font-size: 8px; padding: 1px 6px; border-width: 0.5px; white-space: nowrap;">UTC+6 00:00:00</div>
+    </div>
+    </div>
+    
             <i class="fas fa-th-large text-2xl text-cyan-400" onclick="toggleMenu()"></i>
             <div class="flex flex-col items-center">
                 <div class="clock-panel" id="live-clock">UTC+6 00:00:00</div>
@@ -210,3 +220,4 @@
     </script>
 </body>
 </html>
+
