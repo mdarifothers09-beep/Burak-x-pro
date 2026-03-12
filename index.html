@@ -22,7 +22,6 @@
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .reason-box { font-size: 12px; color: #00ffcc; margin-top: 15px; text-align: center; background: rgba(0, 255, 204, 0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(0, 255, 204, 0.1); width: 100%; height: 80px; overflow-y: auto; }
         #side-menu { display: none; position: fixed; inset: 0; width: 80%; background: #080808; z-index: 10001; border-right: 1px solid #1a1a1a; padding: 50px 25px; }
-        /* টাইম জোন হাইড করার জন্য স্টাইল */
         .clock-hidden { display: none; }
     </style>
 </head>
@@ -32,9 +31,33 @@
         const CONFIG = {
             USERNAME: "Arif09",
             PASSWORD: "Arif@098",
-            GPT_VISION_KEY: "YOUR_PREMIUM_OTC_API_KEY_HERE", 
+            GPT_VISION_KEY: "YOUR_PREMIUM_GPT_VISION_KEY_HERE", 
             PREMIUM_OTC_KEY: "YOUR_PREMIUM_OTC_API_KEY_HERE"
         };
+
+        // --- WebSocket Connection Logic (Added) ---
+        // Quotex Live WebSocket URL
+        const brokerWS = new WebSocket('wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket');
+
+        brokerWS.onopen = function() {
+            console.log("Connected to Quotex OTC Server");
+            const statusLabel = document.getElementById('active-market');
+            if(statusLabel) {
+                statusLabel.innerText = "STATUS: SYNCED WITH OTC SERVER";
+                statusLabel.style.color = "#00ffcc";
+            }
+        };
+
+        brokerWS.onmessage = function(event) {
+            // সার্ভার থেকে আসা রিয়েল-টাইম ডাটা এখানে রিসিভ হবে
+            const data = event.data;
+            // ভবিষ্যতে এই ডাটাটি SMC লজিকে পাস করা যাবে
+        };
+
+        brokerWS.onerror = function(error) {
+            console.log("WebSocket Error: ", error);
+        };
+        // -----------------------------------------
     </script>
 
     <div id="login-page" class="fixed inset-0 z-[20001] bg-black flex flex-col items-center justify-center p-10">
@@ -122,7 +145,6 @@
     <div id="scan-overlay"><div class="radar-circle mb-8"></div><p id="scan-text" class="text-cyan-400 font-bold tracking-[5px] animate-pulse">SYNCING API...</p></div>
 
     <script>
-        // Clock Functionality (Hidden but running in background for system sync)
         function updateClock() {
             const now = new Date();
             const utc6 = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 6));
@@ -222,6 +244,3 @@
     </script>
 </body>
 </html>
-
-
-
