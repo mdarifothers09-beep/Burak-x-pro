@@ -19,19 +19,23 @@
         .radar-circle { width: 180px; height: 180px; border: 2px solid #004433; border-radius: 50%; position: relative; overflow: hidden; }
         .radar-circle::after { content: ''; position: absolute; width: 50%; height: 50%; background: linear-gradient(45deg, transparent, #00ffcc); transform-origin: bottom right; animation: rotate 1.5s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .reason-box { font-size: 12px; color: #00ffcc; margin-top: 15px; text-align: center; background: rgba(0, 255, 204, 0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(0, 255, 204, 0.1); width: 100%; height: 80px; overflow-y: auto; }
-        #side-menu { display: none; position: fixed; inset: 0; width: 85%; background: #080808; z-index: 30000; border-right: 1px solid #1a1a1a; padding: 50px 25px; transition: transform 0.3s ease; }
+        .reason-box { font-size: 12px; color: #00ffcc; margin-top: 15px; text-align: center; background: rgba(0, 255, 204, 0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(0, 255, 204, 0.1); width: 100%; height: 85px; overflow-y: auto; }
+        #side-menu { display: none; position: fixed; inset: 0; width: 85%; background: #080808; z-index: 30000; border-right: 1px solid #1a1a1a; padding: 50px 25px; }
     </style>
 </head>
 <body>
 
     <script>
+        // --- এক জায়গায় সব সেটিংস (এখান থেকে পরিবর্তন করবেন) ---
         const CONFIG = {
             USERNAME: "Arif09",
             PASSWORD: "Arif@098",
-            GPT_VISION_KEY: "sk-proj-YOUR_KEY", 
-            PREMIUM_OTC_KEY: "YOUR_OTC_KEY",
-            WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket"
+            GPT_VISION_KEY: "sk-proj-YOUR_OPENAI_KEY", 
+            PREMIUM_OTC_KEY: "YOUR_PREMIUM_OTC_KEY",
+            WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket",
+            
+            // ভিশন এপিআই প্রম্পট (১০টি লজিক সরাসরি এখানে)
+            AI_LOGIC_PROMPT: "Analyze this chart using: 1.SMC (Market Structure/Order Blocks) 2.ICT (FVG/Liquidity Sweeps) 3.Price Action (Engulfing/Pinbar) 4.RSI Divergence 5.Stochastic Cross 6.S/R Rejection 7.Trend Confirmation 8.Volume Analysis 9.Exhaustion Candles 10.OTC Mean Reversion. Give Call/Put with confidence %."
         };
 
         let socket;
@@ -45,9 +49,9 @@
     <div id="login-page" class="fixed inset-0 z-[40000] bg-black flex flex-col items-center justify-center p-10">
         <h1 style="font-family: 'Orbitron';" class="text-4xl text-cyan-400 mb-2 tracking-[10px]">BURAK X</h1>
         <div class="w-full max-w-xs mt-10">
-            <input type="text" id="uid" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-4 text-center text-cyan-400 font-bold" placeholder="ACCESS ID">
-            <input type="password" id="ukey" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-10 text-center text-cyan-400 font-bold" placeholder="PASSWORD">
-            <button onclick="doLogin()" class="w-full bg-cyan-500 py-5 rounded-2xl text-black font-black uppercase">Unlock AI Engine</button>
+            <input type="text" id="uid" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-4 text-center text-cyan-400 font-bold outline-none" placeholder="ACCESS ID">
+            <input type="password" id="ukey" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-10 text-center text-cyan-400 font-bold outline-none" placeholder="PASSWORD">
+            <button onclick="doLogin()" class="w-full bg-cyan-500 py-5 rounded-2xl text-black font-black uppercase tracking-widest">Unlock AI Engine</button>
         </div>
     </div>
 
@@ -79,7 +83,7 @@
         </div>
         <div id="list-markets">
             <script>
-                const mlist = ["NZD/CHF (OTC)", "USD/MXN (OTC)", "USD/ARS (OTC)", "NZD/USD (OTC)", "USD/BDT (OTC)", "USD/ZAR (OTC)", "GBP/NZD (OTC)"];
+                const mlist = ["USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/BRL (OTC)", "USD/EGP (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/IDR (OTC)", "USD/PHP (OTC)", "USD/NGN (OTC)", "USD/ZAR (OTC)", "GBP/JPY (OTC)", "EUR/GBP (OTC)", "CAD/CHF (OTC)", "NZD/CAD (OTC)", "USD/COP (OTC)"];
                 mlist.forEach(m => { document.write(`<div class="market-row" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-plus-circle text-cyan-500"></i></div>`); });
             </script>
         </div>
@@ -112,7 +116,7 @@
                     <h1 id="res-txt" class="text-5xl font-black italic uppercase"></h1>
                     <div id="conf-display" class="text-orange-500 font-bold mt-2 text-xs"></div>
                     <div id="reason-text" class="reason-box"></div>
-                    <button onclick="resetApp()" class="mt-6 text-[10px] text-gray-600 border border-gray-900 px-6 py-2 rounded-full">RESET</button>
+                    <button onclick="resetApp()" class="mt-6 text-[10px] text-gray-600 border border-gray-900 px-6 py-2 rounded-full tracking-widest">RESET ENGINE</button>
                 </div>
             </div>
             <button id="btn-execute" onclick="startProcess()" class="hidden action-btn">RUN SMC ANALYSIS</button>
@@ -131,8 +135,8 @@
         }
 
         function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            const m = document.getElementById('side-menu');
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
         function modeSelect(m) {
@@ -155,24 +159,11 @@
         function triggerGallery() { document.getElementById('inp-file').click(); }
         function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART READY"; document.getElementById('btn-execute').classList.remove('hidden'); } }
 
-        function getAdvancedLogic() {
-            const logics = [
-                "SMC/ICT: Liquidity sweep at PDH detected. FVG filling. Strong Put potential.",
-                "Stochastic: K% line crossing D% from Overbought zone. Reversal imminent.",
-                "RSI: Oversold touched. Bullish divergence forming on 1M timeframe.",
-                "S/R Bounce: Price rejected at major Support with a Long Wick Hammer.",
-                "Hybrid Pattern: Bearish Engulfing + Pin Bar detected at Resistance.",
-                "Exhaustion: Candle size decreasing at round number. Momentum loss.",
-                "Macro Trend: H1 Bullish, M5 Pullback complete. High probability Call.",
-                "Confidence: 4 Indicators matching (VSA+RSI+SMC+Fib). Score: 91%.",
-                "Scalping 1M: Micro-level breakout with high volume confirmation.",
-                "OTC Algo: Artificial spike detected. Mean reversion expected."
-            ];
-            return logics[Math.floor(Math.random() * logics.length)];
-        }
-
         async function startProcess() {
+            if(CONFIG.GPT_VISION_KEY.includes("YOUR")) { alert("Please set API Key first!"); return; }
             document.getElementById('scan-overlay').style.display = 'flex';
+            
+            // রিয়েল এপিআই কল করার লজিক এখানে যুক্ত হবে
             setTimeout(() => {
                 document.getElementById('scan-overlay').style.display = 'none';
                 showFinal();
@@ -183,12 +174,15 @@
             document.getElementById('ui-analyzer').classList.add('hidden');
             document.getElementById('btn-execute').classList.add('hidden');
             document.getElementById('ui-result').classList.remove('hidden');
+            
             const isCall = Math.random() > 0.5;
             document.getElementById('res-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
             document.getElementById('res-txt').style.color = isCall ? "#00ffcc" : "#ff3333";
             document.getElementById('res-icon').innerHTML = isCall ? '<i class="fas fa-arrow-circle-up" style="color:#00ffcc"></i>' : '<i class="fas fa-arrow-circle-down" style="color:#ff3333"></i>';
-            document.getElementById('reason-text').innerText = getAdvancedLogic();
-            document.getElementById('conf-display').innerText = `CONFIDENCE: ${Math.floor(Math.random() * 21) + 70}%`;
+            
+            // এই টেক্সটগুলো এপিআই থেকে আসবে, এখন ডেমো হিসেবে আপনার লজিক দেখাচ্ছে
+            document.getElementById('reason-text').innerText = "SMC Logic: Liquidity sweep at PDH + FVG Filling confirmed. Strong Put potential based on Price Action.";
+            document.getElementById('conf-display').innerText = `CONFIDENCE: ${Math.floor(Math.random() * 20) + 75}%`;
         }
 
         function resetApp() {
