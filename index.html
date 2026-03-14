@@ -28,9 +28,9 @@
         const MASTER_CONFIG = {
             USERNAME: "Arif09",
             PASSWORD: "Arif@098",
-            VISION_API_KEY: "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",
-            OTC_SERVER_KEY: "YOUR_PREMIUM_OTC_KEY",
-            WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket"
+            VISION_API_KEY: "YOUR_VISION_API_KEY", // এখানে আপনার এপিআই কি দিন
+            OTC_SERVER_KEY: "YOUR_PREMIUM_OTC_KEY", // এখানে আপনার প্রিমিয়াম ওটিসি কি দিন
+            WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket" // ওটিসি লাইভ ডাটা লিঙ্ক
         };
 
         let currentMode = "";
@@ -41,15 +41,15 @@
     <div id="login-page" class="fixed inset-0 z-[40000] bg-black flex flex-col items-center justify-center p-10">
         <h1 style="font-family: 'Orbitron';" class="text-4xl text-cyan-400 mb-2 tracking-[10px]">BURAK X</h1>
         <div class="w-full max-w-xs mt-10">
-            <input type="text" id="uid" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-4 text-center text-cyan-400 font-bold" placeholder="ACCESS ID">
-            <input type="password" id="ukey" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-10 text-center text-cyan-400 font-bold" placeholder="PASSWORD">
-            <button onclick="doLogin()" class="w-full bg-cyan-500 py-5 rounded-2xl text-black font-black uppercase">Unlock BX AI</button>
+            <input type="text" id="uid" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-4 text-center text-cyan-400 font-bold outline-none" placeholder="ACCESS ID">
+            <input type="password" id="ukey" class="w-full bg-[#080808] border border-[#1a1a1a] p-5 rounded-2xl mb-10 text-center text-cyan-400 font-bold outline-none" placeholder="PASSWORD">
+            <button onclick="doLogin()" class="w-full bg-cyan-500 py-5 rounded-2xl text-black font-black uppercase tracking-widest">Unlock BX AI</button>
         </div>
     </div>
 
     <div id="side-menu">
         <div class="flex justify-between items-center mb-10">
-            <h1 class="text-xl text-cyan-400 font-bold uppercase">BX MENU</h1>
+            <h1 class="text-xl text-cyan-400 font-bold uppercase tracking-widest">BX MENU</h1>
             <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
         </div>
         <div class="space-y-4">
@@ -77,9 +77,9 @@
                 <div id="ui-future-settings" class="hidden w-full text-center">
                     <h2 class="text-cyan-400 font-bold mb-6 uppercase tracking-widest text-sm">Select Signal Quantity</h2>
                     <div class="grid grid-cols-3 gap-3 px-2 mb-6">
-                        <button onclick="setQty(5)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold">5</button>
-                        <button onclick="setQty(10)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold">10</button>
-                        <button onclick="setQty(15)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold">15</button>
+                        <button onclick="setQty(5)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold text-xl">5</button>
+                        <button onclick="setQty(10)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold text-xl">10</button>
+                        <button onclick="setQty(15)" class="qty-btn bg-[#0a0a0a] border border-cyan-900 py-3 rounded-xl font-bold text-xl">15</button>
                     </div>
                 </div>
 
@@ -106,6 +106,7 @@
                         </div>
                         <div id="multi-res" class="hidden signal-list"></div>
                         <div id="reason-text" class="text-[11px] text-cyan-400 opacity-50 mt-4 px-4 line-clamp-2"></div>
+                        
                         <button id="next-btn" onclick="nextAnalysis()" class="mt-6 text-[12px] text-black bg-[#00ffcc] font-black px-12 py-4 rounded-full uppercase tracking-widest">Next Analysis</button>
                     </div>
                 </div>
@@ -122,13 +123,7 @@
         </div>
         <div id="list-markets">
             <script>
-                const mlist = [
-                    "USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", 
-                    "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", 
-                    "USD/ZAR (OTC)", "GBP/JPY (OTC)", "USD/EGP (OTC)", "EUR/GBP (OTC)",
-                    "USD/TRY (OTC)", "USD/IDR (OTC)", "AUD/CAD (OTC)", "CAD/JPY (OTC)",
-                    "EUR/JPY (OTC)", "CHF/JPY (OTC)", "GBP/CHF (OTC)", "USD/PKR (OTC)"
-                ];
+                const mlist = ["USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", "USD/ZAR (OTC)", "GBP/JPY (OTC)", "USD/EGP (OTC)", "EUR/GBP (OTC)", "USD/TRY (OTC)", "USD/IDR (OTC)", "AUD/CAD (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "CHF/JPY (OTC)", "GBP/CHF (OTC)", "USD/PKR (OTC)"];
                 mlist.forEach(m => { document.write(`<div class="market-row" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-plus-circle text-cyan-500"></i></div>`); });
             </script>
         </div>
@@ -147,7 +142,8 @@
             if(document.getElementById('uid').value === MASTER_CONFIG.USERNAME && document.getElementById('ukey').value === MASTER_CONFIG.PASSWORD) {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
-            } else alert("Invalid Access!");
+                document.getElementById('active-market').innerText = "Synced with OTC Server";
+            } else alert("INVALID ACCESS!");
         }
 
         function toggleMenu() {
@@ -157,8 +153,7 @@
 
         function modeSelect(m) {
             currentMode = m;
-            toggleMenu();
-            resetUIs();
+            toggleMenu(); resetUIs();
             document.getElementById('header-title').innerText = m;
             if(m === 'LIVE ANALYZER') {
                 document.getElementById('ui-welcome').classList.add('hidden');
@@ -181,15 +176,15 @@
             document.getElementById('btn-execute').classList.remove('hidden');
         }
 
+        function closeModal() { document.getElementById('market-modal').style.display = 'none'; }
+        function triggerGallery() { document.getElementById('inp-file').click(); }
+        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "Chart Ready"; document.getElementById('btn-execute').classList.remove('hidden'); } }
+
         function setQty(q) {
             selectedQty = q;
             document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('border-cyan-400', 'bg-cyan-900/20'));
             event.target.classList.add('border-cyan-400', 'bg-cyan-900/20');
         }
-
-        function closeModal() { document.getElementById('market-modal').style.display = 'none'; }
-        function triggerGallery() { document.getElementById('inp-file').click(); }
-        function fileSelected() { if(document.getElementById('inp-file').files[0]) document.getElementById('upload-status').innerText = "Chart Ready"; }
 
         function startProcess() {
             document.getElementById('scan-overlay').classList.remove('hidden');
@@ -244,7 +239,7 @@
             const isCall = Math.random() > 0.5;
             document.getElementById('res-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
             document.getElementById('res-txt').style.color = isCall ? "#00ffcc" : "#ff3333";
-            document.getElementById('res-icon').innerHTML = isCall ? '<i class="fas fa-arrow-circle-up text-cyan-400"></i>' : '<i class="fas fa-arrow-circle-down text-red-500"></i>';
+            document.getElementById('res-icon').innerHTML = isCall ? '<i class="fas fa-arrow-circle-up text-cyan-400"></i>' : '<i class="fas fa-arrow-circle-down" style="color:#ff3333"></i>';
             document.getElementById('reason-text').innerText = "MSS detected at zone. Order block rejection confirmed on lower timeframe.";
         }
 
@@ -280,6 +275,7 @@
                 document.getElementById('ui-analyzer').classList.remove('hidden');
                 document.getElementById('upload-status').innerText = "Upload Chart Screenshot";
                 document.getElementById('btn-execute').classList.remove('hidden');
+                document.getElementById('inp-file').value = "";
             }
         }
 
@@ -289,9 +285,7 @@
         }
 
         function goHome() {
-            toggleMenu();
-            currentMode = "";
-            resetUIs();
+            toggleMenu(); currentMode = ""; resetUIs();
             document.getElementById('ui-welcome').classList.remove('hidden');
             document.getElementById('header-title').innerText = "BURAK 亗 JINN";
         }
