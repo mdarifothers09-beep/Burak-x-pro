@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BURAK X 亗 - FIX EDITION</title>
+    <title>BURAK X 亗 - FINAL PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -17,7 +17,27 @@
             overflow: hidden; height: 100vh; width: 100vw; margin: 0;
         }
 
-        <div class="display-card scanner-effect">
+        /* স্ক্যানিং এনিমেশন ইফেক্ট */
+        .scanner-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanner-effect::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(191, 90, 242, 0.2), transparent);
+            animation: scan 2s infinite linear;
+        }
+        @keyframes scan {
+            0% { top: -100%; }
+            100% { top: 100%; }
+        }
+
+        .display-card { 
             width: 100%; background: rgba(25, 10, 45, 0.7); 
             border: 1px solid rgba(138, 43, 226, 0.3); 
             border-radius: 40px; padding: 25px; min-height: 480px; 
@@ -67,7 +87,6 @@
 <body>
 
     <script>
-        // --- সকল KEY এবং কনফিগারেশন এক জায়গায় ---
         const APP_MASTER_CONFIG = {
             USERNAME: "arif09",
             PASSWORD: "arif@098",
@@ -79,7 +98,6 @@
                 databaseURL: "YOUR_DATABASE_URL",
                 projectId: "YOUR_PROJECT_ID"
             },
-            // ভিষণ এপিআই এই লজিকগুলো মাথায় রেখে চার্ট রিড করবে
             PRO_LOGIC_PROMPT: "Analysis using SMC+ICT: 1.Check Stochastic Cross 2.RSI 30/70 Reversal 3.Long Wick Rejection at S/R 4.Engulfing/PinBar Hybrid 5.Market Exhaustion 6.Trend Alignment 7.Confidence Calculation 8.1M Scalping 9.Dynamic SMC OrderBlock 10.OTC Cycle Analysis."
         };
 
@@ -122,7 +140,7 @@
         </div>
 
         <div class="flex-grow flex flex-col justify-center items-center">
-            <div class="display-card">
+            <div class="display-card scanner-effect">
                 <div id="active-mode-label" class="mode-label hidden"></div>
 
                 <div id="ui-welcome" class="text-center">
@@ -192,50 +210,34 @@
         }
 
         function toggleMenu() { const m = document.getElementById('side-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-        function closeModal() { document.getElementById('market-modal').style.display = 'none'; }
+        function closeModal() { document.getElementById('market-modal').classList.add('hidden'); }
 
-        // এই ফাংশনটি আগের সব ডাটা মুছে নতুন মোড ওপেন করবে
-function modeSelect(m) {
-    currentMode = m; 
-    toggleMenu(); 
-    resetUIs(); // এটি কল করার ফলে আগের সব লিস্ট পরিষ্কার হয়ে যাবে
+        function modeSelect(m) {
+            currentMode = m; 
+            toggleMenu(); 
+            resetUIs(); 
+            const label = document.getElementById('active-mode-label');
+            label.innerText = "MODE: " + m;
+            label.classList.remove('hidden');
+            if(m === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden'); 
+            else document.getElementById('market-modal').classList.remove('hidden'); 
+        }
 
-    const label = document.getElementById('active-mode-label');
-    label.innerText = "MODE: " + m;
-    label.classList.remove('hidden');
-
-    if(m === 'LIVE ANALYZER') { 
-        document.getElementById('ui-analyzer').classList.remove('hidden'); 
-    } else { 
-        document.getElementById('market-modal').classList.remove('hidden'); 
-    }
-}
-
-// এটি সমস্ত উইন্ডো এবং লিস্ট একবারে ক্লিন করে দেয়
-function resetUIs() {
-    const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn', 'active-mode-label'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.classList.add('hidden');
-    });
-    // ফিউচার লিস্টের ভেতরে থাকা সব সিগন্যাল মুছে ফেলার জন্য:
-    document.getElementById('future-list-ui').innerHTML = ""; 
-    document.getElementById('future-list-ui').classList.add('hidden');
-}
-        
-            if(m === 'LIVE ANALYZER') { 
-                document.getElementById('ui-analyzer').classList.remove('hidden'); 
-            } else { 
-                document.getElementById('market-modal').classList.remove('hidden'); 
-            }
+        function resetUIs() {
+            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn', 'active-mode-label'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById('future-list-ui').innerHTML = ""; 
+            document.getElementById('future-list-ui').classList.add('hidden');
         }
 
         function pickMarket(m) {
             selectedMarket = m; closeModal();
-            if(currentMode === 'FUTURE SIGNAL') {
-                document.getElementById('ui-future-settings').classList.remove('hidden');
-            } else {
-                document.getElementById('ui-welcome').classList.add('hidden'); // হোম মেসেজ হাইড হবে
+            if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
+            else {
+                document.getElementById('ui-welcome').classList.add('hidden');
                 document.getElementById('active-market').innerText = "Active: " + m;
             }
             document.getElementById('btn-execute').classList.remove('hidden');
@@ -247,30 +249,24 @@ function resetUIs() {
         }
 
         function showFinalResults() {
-    resetUIs(); 
-    document.getElementById('ui-result').classList.remove('hidden');
-    document.getElementById('active-mode-label').classList.remove('hidden');
+            resetUIs(); 
+            document.getElementById('ui-result').classList.remove('hidden');
+            document.getElementById('active-mode-label').classList.remove('hidden');
+            document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
 
-    if(currentMode === '10s COMPOUNDING') {
-        // ১০ সেকেন্ডের জন্য ফিউচার লিস্ট হাইড রাখা নিশ্চিত করা হয়েছে
-        document.getElementById('future-list-ui').classList.add('hidden');
-        document.getElementById('comp-box').classList.remove('hidden');
-        run10s();
-    } else if(currentMode === 'FUTURE SIGNAL') {
-        document.getElementById('signal-box').classList.remove('hidden');
-        document.getElementById('single-ui').classList.add('hidden');
-        document.getElementById('future-list-ui').classList.remove('hidden');
-        document.getElementById('copy-btn').classList.remove('hidden');
-        renderFutureList();
-    } else {
-        // লাইভ এনালাইজার মোডে ফিউচার লিস্ট স্ট্রিক্টলি হাইড থাকবে
-        document.getElementById('future-list-ui').classList.add('hidden');
-        document.getElementById('signal-box').classList.remove('hidden');
-        document.getElementById('single-ui').classList.remove('hidden');
-        renderSingleLogic();
-    }
-        }
-        
+            if(currentMode === '10s COMPOUNDING') {
+                document.getElementById('comp-box').classList.remove('hidden');
+                run10s();
+            } else if(currentMode === 'FUTURE SIGNAL') {
+                document.getElementById('signal-box').classList.remove('hidden');
+                document.getElementById('single-ui').classList.add('hidden');
+                document.getElementById('future-list-ui').classList.remove('hidden');
+                document.getElementById('copy-btn').classList.remove('hidden');
+                renderFutureList();
+            } else {
+                document.getElementById('signal-box').classList.remove('hidden');
+                document.getElementById('single-ui').classList.remove('hidden');
+                renderSingleLogic();
             }
         }
 
@@ -292,26 +288,7 @@ function resetUIs() {
             document.getElementById('res-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
             document.getElementById('reason-ui').innerText = "Vision Analysis: " + APP_MASTER_CONFIG.PRO_LOGIC_PROMPT;
         }
-/* স্ক্যানিং এনিমেশন ইফেক্ট */
-.scanner-effect {
-    position: relative;
-    overflow: hidden;
-}
-.scanner-effect::after {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent, rgba(191, 90, 242, 0.2), transparent);
-    animation: scan 2s infinite linear;
-}
-@keyframes scan {
-    0% { top: -100%; }
-    100% { top: 100%; }
-         }
-        
+
         function renderFutureList() {
             const list = document.getElementById('future-list-ui'); list.innerHTML = "";
             let now = new Date();
@@ -331,16 +308,7 @@ function resetUIs() {
         function triggerGallery() { document.getElementById('inp-file').click(); }
         function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART LOADED"; document.getElementById('btn-execute').classList.remove('hidden'); } }
         function setQty(q) { selectedQty = q; document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('border-[#bf5af2]')); event.target.classList.add('border-[#bf5af2]'); document.getElementById('btn-execute').classList.remove('hidden'); }
-        
-        function resetUIs() {
-            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn', 'active-mode-label'];
-            ids.forEach(id => document.getElementById(id).classList.add('hidden'));
-        }
-
-        function goHome() { 
-            toggleMenu(); currentMode = ""; resetUIs(); 
-            document.getElementById('ui-welcome').classList.remove('hidden'); 
-        }
+        function goHome() { toggleMenu(); currentMode = ""; resetUIs(); document.getElementById('ui-welcome').classList.remove('hidden'); }
 
         function nextAnalysis() {
             const prevMode = currentMode;
