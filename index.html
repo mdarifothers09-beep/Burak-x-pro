@@ -194,13 +194,35 @@
         function toggleMenu() { const m = document.getElementById('side-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
         function closeModal() { document.getElementById('market-modal').style.display = 'none'; }
 
-        function modeSelect(m) {
-            currentMode = m; toggleMenu(); resetUIs();
-            // বাম সাইডের চিহ্নিত জায়গায় মোড নাম দেখাবে
-            const label = document.getElementById('active-mode-label');
-            label.innerText = "MODE: " + m;
-            label.classList.remove('hidden');
+        // এই ফাংশনটি আগের সব ডাটা মুছে নতুন মোড ওপেন করবে
+function modeSelect(m) {
+    currentMode = m; 
+    toggleMenu(); 
+    resetUIs(); // এটি কল করার ফলে আগের সব লিস্ট পরিষ্কার হয়ে যাবে
 
+    const label = document.getElementById('active-mode-label');
+    label.innerText = "MODE: " + m;
+    label.classList.remove('hidden');
+
+    if(m === 'LIVE ANALYZER') { 
+        document.getElementById('ui-analyzer').classList.remove('hidden'); 
+    } else { 
+        document.getElementById('market-modal').classList.remove('hidden'); 
+    }
+}
+
+// এটি সমস্ত উইন্ডো এবং লিস্ট একবারে ক্লিন করে দেয়
+function resetUIs() {
+    const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn', 'active-mode-label'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('hidden');
+    });
+    // ফিউচার লিস্টের ভেতরে থাকা সব সিগন্যাল মুছে ফেলার জন্য:
+    document.getElementById('future-list-ui').innerHTML = ""; 
+    document.getElementById('future-list-ui').classList.add('hidden');
+}
+        
             if(m === 'LIVE ANALYZER') { 
                 document.getElementById('ui-analyzer').classList.remove('hidden'); 
             } else { 
@@ -225,23 +247,30 @@
         }
 
         function showFinalResults() {
-            resetUIs(); 
-            document.getElementById('ui-result').classList.remove('hidden');
-            document.getElementById('active-mode-label').classList.remove('hidden');
+    resetUIs(); 
+    document.getElementById('ui-result').classList.remove('hidden');
+    document.getElementById('active-mode-label').classList.remove('hidden');
 
-            if(currentMode === '10s COMPOUNDING') {
-                document.getElementById('comp-box').classList.remove('hidden');
-                run10s();
-            } else if(currentMode === 'FUTURE SIGNAL') {
-                document.getElementById('signal-box').classList.remove('hidden');
-                document.getElementById('single-ui').classList.add('hidden');
-                document.getElementById('future-list-ui').classList.remove('hidden');
-                document.getElementById('copy-btn').classList.remove('hidden');
-                renderFutureList();
-            } else {
-                document.getElementById('signal-box').classList.remove('hidden');
-                document.getElementById('single-ui').classList.remove('hidden');
-                renderSingleLogic();
+    if(currentMode === '10s COMPOUNDING') {
+        // ১০ সেকেন্ডের জন্য ফিউচার লিস্ট হাইড রাখা নিশ্চিত করা হয়েছে
+        document.getElementById('future-list-ui').classList.add('hidden');
+        document.getElementById('comp-box').classList.remove('hidden');
+        run10s();
+    } else if(currentMode === 'FUTURE SIGNAL') {
+        document.getElementById('signal-box').classList.remove('hidden');
+        document.getElementById('single-ui').classList.add('hidden');
+        document.getElementById('future-list-ui').classList.remove('hidden');
+        document.getElementById('copy-btn').classList.remove('hidden');
+        renderFutureList();
+    } else {
+        // লাইভ এনালাইজার মোডে ফিউচার লিস্ট স্ট্রিক্টলি হাইড থাকবে
+        document.getElementById('future-list-ui').classList.add('hidden');
+        document.getElementById('signal-box').classList.remove('hidden');
+        document.getElementById('single-ui').classList.remove('hidden');
+        renderSingleLogic();
+    }
+        }
+        
             }
         }
 
