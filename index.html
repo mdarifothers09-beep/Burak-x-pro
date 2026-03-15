@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BURAK X 亗 - PURPLE PRO</title>
+    <title>BURAK X 亗 - FIX EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -11,14 +11,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap');
         
-        /* ব্যাকগ্রাউন্ড কালার: প্রফেশনাল পার্পেল থিম */
         body { 
             background: linear-gradient(135deg, #0f0a1e 0%, #1a0b2e 100%); 
             color: #fff; font-family: 'Rajdhani', sans-serif; 
             overflow: hidden; height: 100vh; width: 100vw; margin: 0;
         }
 
-        /* কার্ড ডিজাইন */
         .display-card { 
             width: 100%; background: rgba(25, 10, 45, 0.7); 
             border: 1px solid rgba(138, 43, 226, 0.3); 
@@ -32,7 +30,6 @@
             width: 100%; background: #9d50bb; color: #fff; 
             padding: 18px; border-radius: 20px; font-weight: 900; 
             font-size: 16px; text-transform: uppercase; margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(157, 80, 187, 0.4);
         }
 
         .welcome-text { 
@@ -42,6 +39,11 @@
             text-align: center; line-height: 1.2;
         }
 
+        .mode-label {
+            color: #bf5af2; font-size: 14px; font-weight: bold;
+            margin-bottom: 15px; letter-spacing: 2px;
+        }
+
         .reason-box { 
             font-size: 12px; color: #d1b3ff; margin-top: 15px; text-align: center; 
             background: rgba(255, 255, 255, 0.03); padding: 12px; 
@@ -49,9 +51,10 @@
             width: 100%; height: 90px; overflow-y: auto; 
         }
 
-        .completed-tag {
-            color: #00ffcc; font-size: 10px; font-weight: bold; 
-            letter-spacing: 2px; margin-bottom: 5px; text-transform: uppercase;
+        #side-menu { 
+            display: none; position: fixed; inset: 0; width: 80%; 
+            background: #0f0a1e; z-index: 30000; padding: 50px 25px; 
+            border-right: 1px solid #331a4d; 
         }
 
         .signal-item { 
@@ -59,19 +62,12 @@
             padding: 12px; border-radius: 12px; margin-bottom: 6px; 
             display: flex; justify-content: space-between; 
         }
-
-        /* সাইড মেনু পার্পেল থিম */
-        #side-menu { 
-            display: none; position: fixed; inset: 0; width: 80%; 
-            background: #0f0a1e; z-index: 30000; padding: 50px 25px; 
-            border-right: 1px solid #331a4d; 
-        }
     </style>
 </head>
 <body>
 
     <script>
-        // --- এই সেকশনে সব KEY এক জায়গায় রাখা হয়েছে (পরিবর্তন করতে পারবেন) ---
+        // --- সকল KEY এবং কনফিগারেশন এক জায়গায় ---
         const APP_MASTER_CONFIG = {
             USERNAME: "Arif09",
             PASSWORD: "Arif@098",
@@ -83,8 +79,8 @@
                 databaseURL: "YOUR_DATABASE_URL",
                 projectId: "YOUR_PROJECT_ID"
             },
-            // ১০টি অ্যাডভান্স লজিক যা ভিশন এপিআই মেনে চলবে
-            PRO_LOGIC: "SMC+ICT+PriceAction: 1.Stochastic Overbought Cross 2.RSI Reversal(30/70) 3.S/R Long Wick Rejection 4.Engulfing/PinBar Hybrid 5.Market Exhaustion 6.Macro Trend Analysis 7.Confidence Score Calculation 8.1M Scalping Focus 9.Dynamic SMC Reason 10.OTC Algo Sync."
+            // ভিষণ এপিআই এই লজিকগুলো মাথায় রেখে চার্ট রিড করবে
+            PRO_LOGIC_PROMPT: "Analysis using SMC+ICT: 1.Check Stochastic Cross 2.RSI 30/70 Reversal 3.Long Wick Rejection at S/R 4.Engulfing/PinBar Hybrid 5.Market Exhaustion 6.Trend Alignment 7.Confidence Calculation 8.1M Scalping 9.Dynamic SMC OrderBlock 10.OTC Cycle Analysis."
         };
 
         let currentMode = "";
@@ -97,13 +93,13 @@
         <div class="w-full max-w-xs">
             <input type="text" id="uid" class="w-full bg-[#1a0b2e] border border-[#331a4d] p-5 rounded-2xl mb-4 text-center text-white outline-none" placeholder="USER ID">
             <input type="password" id="ukey" class="w-full bg-[#1a0b2e] border border-[#331a4d] p-5 rounded-2xl mb-10 text-center text-white outline-none" placeholder="PASSWORD">
-            <button onclick="doLogin()" class="w-full bg-[#9d50bb] py-5 rounded-2xl text-white font-black uppercase">Start AI Engine</button>
+            <button onclick="doLogin()" class="w-full bg-[#9d50bb] py-5 rounded-2xl text-white font-black uppercase">Launch AI</button>
         </div>
     </div>
 
     <div id="side-menu">
         <div class="flex justify-between items-center mb-10 text-[#bf5af2]">
-            <h1 class="text-xl font-bold uppercase">BX SETTINGS</h1>
+            <h1 class="text-xl font-bold uppercase">BX MODES</h1>
             <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
         </div>
         <div class="space-y-4">
@@ -111,7 +107,7 @@
             <div class="p-5 bg-[#1a0b2e] rounded-2xl font-bold uppercase flex items-center" onclick="modeSelect('FUTURE SIGNAL')"><i class="fas fa-chart-line mr-4"></i> Future Signal</div>
             <div class="p-5 bg-[#1a0b2e] rounded-2xl font-bold uppercase flex items-center" onclick="modeSelect('10s COMPOUNDING')"><i class="fas fa-bolt mr-4"></i> 10s Compound</div>
             <div class="p-5 bg-[#1a0b2e] rounded-2xl font-bold uppercase flex items-center" onclick="modeSelect('LIVE ANALYZER')"><i class="fas fa-microscope mr-4"></i> Live Analyzer</div>
-            <div class="p-5 bg-red-900/20 text-red-400 rounded-2xl font-bold uppercase flex items-center mt-10" onclick="location.reload()"><i class="fas fa-sign-out-alt mr-4"></i> Logout System</div>
+            <div class="p-5 bg-red-900/20 text-red-400 rounded-2xl font-bold uppercase flex items-center mt-10" onclick="location.reload()"><i class="fas fa-power-off mr-4"></i> Logout</div>
         </div>
     </div>
 
@@ -120,20 +116,22 @@
             <i class="fas fa-bars text-2xl text-[#bf5af2]" onclick="toggleMenu()"></i>
             <div class="text-center">
                 <h1 style="font-family: 'Orbitron';" class="text-lg font-black text-white uppercase">BURAK 亗 JINN</h1>
-                <p id="conf-score" class="text-[9px] text-green-400 font-bold uppercase">Today Confidence: 89%</p>
+                <p class="text-[9px] text-green-400 font-bold uppercase">Confidence Score: 91%</p>
             </div>
             <div class="w-6"></div>
         </div>
 
         <div class="flex-grow flex flex-col justify-center items-center">
             <div class="display-card">
+                <div id="active-mode-label" class="mode-label hidden"></div>
+
                 <div id="ui-welcome" class="text-center">
-                    <h1 class="welcome-text text-3xl">CONNECTED <br> SERVER</h1>
-                    <p id="active-market" class="text-[10px] text-[#bf5af2] mt-6 tracking-[6px] uppercase">Market: Scanning...</p>
+                    <h1 class="welcome-text text-3xl">WELLCOME <br> BROTHER</h1>
+                    <p id="active-market" class="text-[10px] text-[#bf5af2] mt-6 tracking-[6px] uppercase">Market: Waiting Selection</p>
                 </div>
 
                 <div id="ui-future-settings" class="hidden w-full text-center">
-                    <h2 class="text-[#bf5af2] font-bold mb-4 uppercase text-xs">Signal Quantity</h2>
+                    <p class="text-[10px] mb-4 text-gray-400 uppercase">Select Generation Quantity</p>
                     <div class="grid grid-cols-3 gap-3 px-2">
                         <button onclick="setQty(5)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">5</button>
                         <button onclick="setQty(10)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">10</button>
@@ -143,14 +141,14 @@
 
                 <div id="ui-analyzer" class="hidden w-full text-center px-5">
                     <div class="w-full border-2 border-dashed border-[#331a4d] rounded-[30px] py-14 bg-[#0f0a1e]" onclick="triggerGallery()">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-[#bf5af2] mb-4 opacity-50"></i>
-                        <h1 id="upload-status" class="text-xs font-black text-gray-400 uppercase">Upload Chart Screenshot</h1>
+                        <i class="fas fa-image text-4xl text-[#bf5af2] mb-4 opacity-50"></i>
+                        <h1 id="upload-status" class="text-xs font-black text-gray-400 uppercase">Drop Chart Screenshot</h1>
                     </div>
                     <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="fileSelected()">
                 </div>
 
                 <div id="ui-result" class="hidden flex flex-col items-center text-center w-full">
-                    <p class="completed-tag">Analysis Completed</p>
+                    <p class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4">ANALYSIS COMPLETED</p>
                     
                     <div id="comp-box" class="hidden flex flex-col items-center">
                         <div id="comp-icon" class="text-[100px] mb-2"></div>
@@ -163,43 +161,34 @@
                             <div id="res-icon" class="text-[90px] mb-2"></div>
                             <h1 id="res-txt" class="text-4xl font-black italic mb-2"></h1>
                         </div>
-                        <div id="future-list-ui" class="hidden signal-list w-full overflow-y-auto max-h-[250px] mb-4"></div>
-                        <button id="copy-btn" onclick="copySignals()" class="hidden mb-4 text-[10px] bg-[#331a4d] px-4 py-2 rounded-lg">COPY ALL SIGNALS</button>
+                        <div id="future-list-ui" class="hidden signal-list w-full overflow-y-auto max-h-[200px] mb-4"></div>
+                        <button id="copy-btn" onclick="copySignals()" class="hidden mb-4 text-[10px] bg-[#331a4d] px-6 py-2 rounded-lg uppercase">Copy Signals</button>
                         
                         <div id="reason-ui" class="reason-box"></div>
                         <button onclick="nextAnalysis()" class="mt-6 text-[11px] text-white bg-[#9d50bb] font-black px-10 py-4 rounded-full uppercase tracking-widest">Next Analysis</button>
                     </div>
                 </div>
             </div>
-            <button id="btn-execute" onclick="startProcess()" class="hidden action-btn">Run SMC Engine</button>
+            <button id="btn-execute" onclick="startProcess()" class="hidden action-btn">Run Analysis</button>
         </div>
     </div>
 
-    <div id="market-modal" class="modal-overlay">
-        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold uppercase">Select Market</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
-        <div id="list-markets" class="space-y-2">
+    <div id="market-modal" class="modal-overlay fixed inset-0 bg-[#0f0a1e] z-[35000] hidden p-10 overflow-y-auto">
+        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold">MARKETS</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
+        <div id="list-markets" class="grid grid-cols-1 gap-3">
             <script>
-                const mlist = [
-                    "USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", 
-                    "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", 
-                    "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/TRY (OTC)", "GBP/JPY (OTC)", 
-                    "CHF/JPY (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "GBP/CHF (OTC)", 
-                    "USD/ZAR (OTC)", "AUD/CAD (OTC)", "EUR/GBP (OTC)", "USD/EGP (OTC)"
-                ];
-                mlist.forEach(m => { 
-                    document.write(`<div class="p-4 bg-[#1a0b2e] rounded-xl flex justify-between" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-chevron-right text-[#bf5af2]"></i></div>`); 
-                });
+                const mlist = ["USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/TRY (OTC)", "GBP/JPY (OTC)", "CHF/JPY (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "GBP/CHF (OTC)", "USD/ZAR (OTC)", "AUD/CAD (OTC)", "EUR/GBP (OTC)", "USD/EGP (OTC)"];
+                mlist.forEach(m => { document.write(`<div class="p-4 bg-[#1a0b2e] rounded-xl flex justify-between border border-[#331a4d]" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-chevron-right"></i></div>`); });
             </script>
         </div>
     </div>
 
     <script>
-        // --- লগইন এবং মেনু লজিক ---
         function doLogin() {
             if(document.getElementById('uid').value === APP_MASTER_CONFIG.USERNAME && document.getElementById('ukey').value === APP_MASTER_CONFIG.PASSWORD) {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
-            } else alert("Invalid ID/Key!");
+            } else alert("Access Denied!");
         }
 
         function toggleMenu() { const m = document.getElementById('side-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
@@ -207,66 +196,74 @@
 
         function modeSelect(m) {
             currentMode = m; toggleMenu(); resetUIs();
-            document.getElementById('header-title').innerText = m;
-            if(m === 'LIVE ANALYZER') { document.getElementById('ui-analyzer').classList.remove('hidden'); } 
-            else { document.getElementById('market-modal').style.display = 'block'; }
+            // বাম সাইডের চিহ্নিত জায়গায় মোড নাম দেখাবে
+            const label = document.getElementById('active-mode-label');
+            label.innerText = "MODE: " + m;
+            label.classList.remove('hidden');
+
+            if(m === 'LIVE ANALYZER') { 
+                document.getElementById('ui-analyzer').classList.remove('hidden'); 
+            } else { 
+                document.getElementById('market-modal').classList.remove('hidden'); 
+            }
         }
 
         function pickMarket(m) {
             selectedMarket = m; closeModal();
-            if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
-            else { document.getElementById('ui-welcome').classList.remove('hidden'); document.getElementById('active-market').innerText = "Market: " + m; }
+            if(currentMode === 'FUTURE SIGNAL') {
+                document.getElementById('ui-future-settings').classList.remove('hidden');
+            } else {
+                document.getElementById('ui-welcome').classList.add('hidden'); // হোম মেসেজ হাইড হবে
+                document.getElementById('active-market').innerText = "Active: " + m;
+            }
             document.getElementById('btn-execute').classList.remove('hidden');
         }
 
-        // --- এনালাইসিস এবং রেজাল্ট লজিক ---
         function startProcess() {
-            document.getElementById('btn-execute').innerText = "AI Analyzing Chart...";
-            setTimeout(() => { showFinalResults(); }, 3000);
+            document.getElementById('btn-execute').innerText = "AI Processing Logic...";
+            setTimeout(() => { showFinalResults(); }, 2500);
         }
 
         function showFinalResults() {
-            resetUIs(); document.getElementById('ui-result').classList.remove('hidden');
-            if(currentMode === '10s COMPOUNDING') { document.getElementById('comp-box').classList.remove('hidden'); run10s(); }
-            else if(currentMode === 'FUTURE SIGNAL') { 
-                document.getElementById('signal-box').classList.remove('hidden'); 
-                document.getElementById('single-ui').classList.add('hidden'); 
+            resetUIs(); 
+            document.getElementById('ui-result').classList.remove('hidden');
+            document.getElementById('active-mode-label').classList.remove('hidden');
+
+            if(currentMode === '10s COMPOUNDING') {
+                document.getElementById('comp-box').classList.remove('hidden');
+                run10s();
+            } else if(currentMode === 'FUTURE SIGNAL') {
+                document.getElementById('signal-box').classList.remove('hidden');
+                document.getElementById('single-ui').classList.add('hidden');
                 document.getElementById('future-list-ui').classList.remove('hidden');
                 document.getElementById('copy-btn').classList.remove('hidden');
-                renderFutureList(); 
-            } else { 
-                document.getElementById('signal-box').classList.remove('hidden'); 
-                document.getElementById('single-ui').classList.remove('hidden'); 
-                document.getElementById('future-list-ui').classList.add('hidden');
-                renderSingleLogic(); 
+                renderFutureList();
+            } else {
+                document.getElementById('signal-box').classList.remove('hidden');
+                document.getElementById('single-ui').classList.remove('hidden');
+                renderSingleLogic();
             }
         }
 
-        // ১০ সেকেন্ড কম্পাউন্ডিং (কালার ফিক্সসহ)
         function run10s() {
             let t = 10; const isCall = Math.random() > 0.5;
             const txt = document.getElementById('comp-txt');
             txt.innerText = isCall ? "CALL ↑" : "PUT ↓";
             txt.style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('comp-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            
-            const inv = setInterval(() => {
-                t--; document.getElementById('timer-display').innerText = t;
-                if(t<=0) { clearInterval(inv); document.getElementById('reason-ui').innerText = "SMC Logic: 10s timeframe liquidity sweep confirmed. High momentum entry."; }
-            }, 1000);
+            const inv = setInterval(() => { t--; document.getElementById('timer-display').innerText = t; if(t<=0) clearInterval(inv); }, 1000);
+            document.getElementById('reason-ui').innerText = "SMC Logic: 10s timeframe liquidity sweep detected. Entry based on Bullish FVG.";
         }
 
-        // সিঙ্গেল এনালাইজার (কালার ফিক্সসহ)
         function renderSingleLogic() {
             const isCall = Math.random() > 0.5;
             const txt = document.getElementById('res-txt');
             txt.innerText = isCall ? "CALL ↑" : "PUT ↓";
             txt.style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('res-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            document.getElementById('reason-ui').innerText = "Vision AI: Stochastic cross at oversold zone + RSI Reversal. High probability " + (isCall?"Bullish":"Bearish") + " movement.";
+            document.getElementById('reason-ui').innerText = "Vision Analysis: " + APP_MASTER_CONFIG.PRO_LOGIC_PROMPT;
         }
 
-        // ফিউচার লিস্ট রেন্ডার
         function renderFutureList() {
             const list = document.getElementById('future-list-ui'); list.innerHTML = "";
             let now = new Date();
@@ -275,22 +272,38 @@
                 const isCall = Math.random() > 0.5;
                 list.innerHTML += `<div class="signal-item" style="border-left: 4px solid ${isCall?'#00ffcc':'#ff4d4d'}"><span>${now.getHours()}:${(now.getMinutes()<10?'0':'')+now.getMinutes()}</span><b>${selectedMarket}</b><span style="color:${isCall?'#00ffcc':'#ff4d4d'}">${isCall?'CALL':'PUT'}</span></div>`;
             }
-            document.getElementById('reason-ui').innerText = "Algorithm: SMC Order Block detected for multiple timeframes. Market structure remains intact.";
         }
 
-        // কপি সিস্টেম
         function copySignals() {
             const signals = document.getElementById('future-list-ui').innerText;
             navigator.clipboard.writeText(signals);
-            alert("All Signals Copied!");
+            alert("Copied to Clipboard!");
         }
 
         function triggerGallery() { document.getElementById('inp-file').click(); }
-        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART READY"; document.getElementById('btn-execute').classList.remove('hidden'); } }
-        function setQty(q) { selectedQty = q; document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('border-[#bf5af2]', 'bg-[#bf5af2]/20')); event.target.classList.add('border-[#bf5af2]', 'bg-[#bf5af2]/20'); }
-        function nextAnalysis() { resetUIs(); if(currentMode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden'); else if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden'); else document.getElementById('ui-welcome').classList.remove('hidden'); document.getElementById('btn-execute').classList.remove('hidden'); document.getElementById('btn-execute').innerText = "Run SMC Engine"; }
-        function resetUIs() { const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn']; ids.forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById('timer-display').innerText = "10"; }
-        function goHome() { toggleMenu(); currentMode = ""; resetUIs(); document.getElementById('ui-welcome').classList.remove('hidden'); document.getElementById('header-title').innerText = "BURAK 亗 JINN"; }
+        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART LOADED"; document.getElementById('btn-execute').classList.remove('hidden'); } }
+        function setQty(q) { selectedQty = q; document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('border-[#bf5af2]')); event.target.classList.add('border-[#bf5af2]'); document.getElementById('btn-execute').classList.remove('hidden'); }
+        
+        function resetUIs() {
+            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'copy-btn', 'active-mode-label'];
+            ids.forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
+
+        function goHome() { 
+            toggleMenu(); currentMode = ""; resetUIs(); 
+            document.getElementById('ui-welcome').classList.remove('hidden'); 
+        }
+
+        function nextAnalysis() {
+            const prevMode = currentMode;
+            resetUIs();
+            currentMode = prevMode;
+            document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
+            document.getElementById('active-mode-label').classList.remove('hidden');
+            if(currentMode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
+            else if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
+            else document.getElementById('btn-execute').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
