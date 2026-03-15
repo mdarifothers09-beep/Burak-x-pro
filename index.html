@@ -292,7 +292,26 @@ function resetUIs() {
             document.getElementById('res-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
             document.getElementById('reason-ui').innerText = "Vision Analysis: " + APP_MASTER_CONFIG.PRO_LOGIC_PROMPT;
         }
-
+/* স্ক্যানিং এনিমেশন ইফেক্ট */
+.scanner-effect {
+    position: relative;
+    overflow: hidden;
+}
+.scanner-effect::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(191, 90, 242, 0.2), transparent);
+    animation: scan 2s infinite linear;
+}
+@keyframes scan {
+    0% { top: -100%; }
+    100% { top: 100%; }
+         }
+        
         function renderFutureList() {
             const list = document.getElementById('future-list-ui'); list.innerHTML = "";
             let now = new Date();
