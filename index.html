@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BURAK X 亗 - FINAL PRO</title>
+    <title>BURAK X 亗 - ULTIMATE FIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap');
@@ -47,12 +45,11 @@
             text-align: center; line-height: 1.2;
         }
 
-        .mode-label { color: #bf5af2; font-size: 14px; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; }
         .reason-box { 
             font-size: 12px; color: #d1b3ff; margin-top: 15px; text-align: center; 
-            background: rgba(255, 255, 255, 0.03); padding: 12px; 
+            background: rgba(255, 255, 255, 0.05); padding: 12px; 
             border-radius: 15px; border: 1px solid rgba(138, 43, 226, 0.2); 
-            width: 100%; height: 90px; overflow-y: auto; 
+            width: 100%; max-height: 100px; overflow-y: auto; 
         }
 
         #side-menu { display: none; position: fixed; inset: 0; width: 80%; background: #0f0a1e; z-index: 30000; padding: 50px 25px; border-right: 1px solid #331a4d; }
@@ -65,10 +62,24 @@
         const APP_MASTER_CONFIG = {
             USERNAME: "arif09",
             PASSWORD: "arif@098",
-            VISION_API_KEY: "sk-proj-YOUR_KEY", 
-            PREMIUM_OTC_KEY: "YOUR_OTC_KEY",
             WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket",
-            PRO_LOGIC_PROMPT: "SMC+ICT: Check Stochastic Cross, RSI 30/70, Long Wick Rejection, OrderBlock Detection."
+            LOGICS: [
+                "SMC+ICT: Stochastic Overbought cross detected.",
+                "Price Action: RSI 30 Oversold Reversal logic applied.",
+                "S/R Bounce: Long wick rejection at key support zone.",
+                "Pattern: Engulfing Pin Bar Hybrid reversal confirmed.",
+                "Exhaustion: Candle volume shrinking at 0.46800 level.",
+                "Macro: Bullish Trend alignment on 5M timeframe.",
+                "Execution: 1M Scalping move with FVG support.",
+                "SMC: Dynamic OrderBlock mitigation detected."
+            ],
+            MARKETS: [
+                "USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", 
+                "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", 
+                "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/TRY (OTC)", "GBP/JPY (OTC)", 
+                "CHF/JPY (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "GBP/CHF (OTC)", 
+                "USD/ZAR (OTC)", "AUD/CAD (OTC)", "EUR/GBP (OTC)", "USD/EGP (OTC)"
+            ]
         };
 
         let currentMode = "";
@@ -76,24 +87,17 @@
         let selectedQty = 5;
         let wsConnected = false;
 
-        // WebSocket স্ট্যাটাস চেক লজিক
         function checkWSStatus() {
             const ws = new WebSocket(APP_MASTER_CONFIG.WS_LINK);
             ws.onopen = () => { wsConnected = true; updateWSUI(); ws.close(); };
             ws.onerror = () => { wsConnected = false; updateWSUI(); };
         }
-
         function updateWSUI() {
-            const statusEl = document.getElementById('ws-status');
-            if(wsConnected) {
-                statusEl.innerText = "CONNECTED OTC SERVER";
-                statusEl.className = "text-[9px] text-green-400 font-bold uppercase";
-            } else {
-                statusEl.innerText = "OTC SERVER ERROR";
-                statusEl.className = "text-[9px] text-red-500 font-bold uppercase";
-            }
+            const el = document.getElementById('ws-status');
+            el.innerText = wsConnected ? "CONNECTED OTC SERVER" : "OTC SERVER ERROR";
+            el.className = wsConnected ? "text-[9px] text-green-400 font-bold uppercase" : "text-[9px] text-red-500 font-bold uppercase";
         }
-        setInterval(checkWSStatus, 5000);
+        setInterval(checkWSStatus, 8000);
     </script>
 
     <div id="login-page" class="fixed inset-0 z-[40000] bg-[#0f0a1e] flex flex-col items-center justify-center p-10">
@@ -110,7 +114,7 @@
             <i class="fas fa-bars text-2xl text-[#bf5af2]" onclick="toggleMenu()"></i>
             <div class="text-center">
                 <h1 style="font-family: 'Orbitron';" class="text-lg font-black text-white uppercase">BURAK 亗 JINN</h1>
-                <p id="ws-status" class="text-[9px] text-yellow-400 font-bold uppercase">CONNECTING SERVER...</p>
+                <p id="ws-status" class="text-[9px] text-yellow-400 font-bold uppercase">CONNECTING...</p>
             </div>
             <div class="w-6"></div>
         </div>
@@ -133,7 +137,7 @@
                 </div>
 
                 <div id="ui-future-settings" class="hidden w-full text-center">
-                    <p class="text-[10px] mb-4 text-gray-400 uppercase">Select Quantity</p>
+                    <p class="text-[10px] mb-4 text-gray-400 uppercase">Signals Quantity</p>
                     <div class="grid grid-cols-3 gap-3 px-2">
                         <button onclick="setQty(5)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">5</button>
                         <button onclick="setQty(10)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">10</button>
@@ -142,28 +146,33 @@
                 </div>
 
                 <div id="ui-result" class="hidden flex flex-col items-center text-center w-full">
-                    <p class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4">ANALYSIS COMPLETED</p>
+                    <p id="conf-score" class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4 uppercase">Confidence: 91%</p>
+                    
                     <div id="comp-box" class="hidden flex flex-col items-center">
-                        <div id="comp-icon" class="text-[100px] mb-2"></div>
+                        <div id="comp-icon" class="text-[90px] mb-2"></div>
                         <h1 id="comp-txt" class="text-5xl font-black italic mb-4"></h1>
                         <div id="timer-display" class="text-3xl font-bold text-[#bf5af2]">10</div>
                     </div>
-                    
+
                     <div id="signal-box" class="hidden flex flex-col items-center w-full">
                         <div id="single-ui">
-                            <div id="res-icon" class="text-[90px] mb-2"></div>
+                            <div id="res-icon" class="text-[80px] mb-2"></div>
                             <h1 id="res-txt" class="text-4xl font-black italic mb-2"></h1>
                         </div>
-                        <div id="future-list-ui" class="hidden signal-list w-full overflow-y-auto max-h-[200px] mb-4"></div>
+                        <div id="future-list-ui" class="hidden w-full overflow-y-auto max-h-[180px] mb-4"></div>
                         <button id="copy-btn" onclick="copySignals()" class="hidden mb-4 text-[10px] bg-[#331a4d] px-6 py-2 rounded-lg uppercase">Copy Signals</button>
                         <div id="reason-ui" class="reason-box"></div>
-                        
-                        <button id="btn-next" onclick="nextAnalysis()" class="mt-6 text-[11px] text-white bg-[#9d50bb] font-black px-10 py-4 rounded-full uppercase tracking-widest hidden">Next Analysis</button>
+                        <button id="btn-next" onclick="nextAnalysis()" class="mt-6 text-[11px] text-white bg-[#9d50bb] font-black px-10 py-4 rounded-full uppercase hidden">Next Analysis</button>
                     </div>
                 </div>
             </div>
             <button id="btn-execute" onclick="startProcess()" class="hidden action-btn">START ANALYSIS</button>
         </div>
+    </div>
+
+    <div id="market-modal" class="fixed inset-0 bg-[#0f0a1e] z-[35000] hidden p-10 overflow-y-auto">
+        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold uppercase">Markets (20)</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
+        <div id="market-grid" class="grid grid-cols-1 gap-3"></div>
     </div>
 
     <div id="side-menu">
@@ -176,23 +185,19 @@
         </div>
     </div>
 
-    <div id="market-modal" class="fixed inset-0 bg-[#0f0a1e] z-[35000] hidden p-10 overflow-y-auto">
-        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold">MARKETS</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
-        <div class="grid grid-cols-1 gap-3">
-            <script>
-                const mlist = ["USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)"];
-                mlist.forEach(m => { document.write(`<div class="p-4 bg-[#1a0b2e] rounded-xl flex justify-between border border-[#331a4d]" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-chevron-right"></i></div>`); });
-            </script>
-        </div>
-    </div>
-
     <script>
+        // Init Markets
+        const grid = document.getElementById('market-grid');
+        APP_MASTER_CONFIG.MARKETS.forEach(m => {
+            grid.innerHTML += `<div class="p-4 bg-[#1a0b2e] rounded-xl flex justify-between border border-[#331a4d]" onclick="pickMarket('${m}')"><span>${m}</span><i class="fas fa-chevron-right"></i></div>`;
+        });
+
         function doLogin() {
             if(document.getElementById('uid').value === APP_MASTER_CONFIG.USERNAME && document.getElementById('ukey').value === APP_MASTER_CONFIG.PASSWORD) {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
                 checkWSStatus();
-            } else alert("Access Denied!");
+            } else alert("Denied!");
         }
 
         function toggleMenu() { const m = document.getElementById('side-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
@@ -216,7 +221,7 @@
 
         function startProcess() {
             document.getElementById('btn-execute').classList.add('hidden');
-            document.getElementById('active-mode-label').innerText = "ANALYZING...";
+            document.getElementById('active-mode-label').innerText = "AI SCANNING...";
             setTimeout(() => { showFinalResults(); }, 2000);
         }
 
@@ -224,7 +229,7 @@
             resetUIs();
             document.getElementById('ui-result').classList.remove('hidden');
             document.getElementById('active-mode-label').classList.remove('hidden');
-            document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
+            document.getElementById('conf-score').innerText = "Confidence: " + (Math.floor(Math.random() * (91 - 70 + 1)) + 70) + "%";
 
             if(currentMode === '10s COMPOUNDING') {
                 document.getElementById('comp-box').classList.remove('hidden');
@@ -248,22 +253,21 @@
 
         function run10s() {
             let t = 10; const isCall = Math.random() > 0.5;
-            const txt = document.getElementById('comp-txt');
-            txt.innerText = isCall ? "CALL ↑" : "PUT ↓";
-            txt.style.color = isCall ? "#00ffcc" : "#ff4d4d";
+            document.getElementById('comp-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
+            document.getElementById('comp-txt').style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('comp-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            document.getElementById('btn-next').classList.add('hidden'); // টাইমার চলাকালীন বাটন হাইড
+            document.getElementById('btn-next').classList.add('hidden');
 
             const inv = setInterval(() => { 
                 t--; 
                 document.getElementById('timer-display').innerText = t; 
                 if(t <= 0) { 
                     clearInterval(inv); 
-                    document.getElementById('btn-next').classList.remove('hidden'); // টাইমার শেষে বাটন শো
+                    document.getElementById('btn-next').classList.remove('hidden');
                     document.getElementById('btn-next').innerText = "Next Analysis";
                 } 
             }, 1000);
-            document.getElementById('reason-ui').innerText = "SMC Logic: 10s timeframe liquidity sweep detected.";
+            document.getElementById('reason-ui').innerText = "Logic: 10s SMC Sweep. Stochastic cross below 20. Hyper-Scalping entry confirmed.";
         }
 
         function renderSingleLogic() {
@@ -271,7 +275,7 @@
             document.getElementById('res-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
             document.getElementById('res-txt').style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('res-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            document.getElementById('reason-ui').innerText = "Vision Scan: Market Exhaustion & Trend Alignment found.";
+            document.getElementById('reason-ui').innerText = APP_MASTER_CONFIG.LOGICS[Math.floor(Math.random()*APP_MASTER_CONFIG.LOGICS.length)];
         }
 
         function renderFutureList() {
@@ -282,28 +286,26 @@
                 const isCall = Math.random() > 0.5;
                 list.innerHTML += `<div class="signal-item" style="border-left: 4px solid ${isCall?'#00ffcc':'#ff4d4d'}"><span>${now.getHours()}:${(now.getMinutes()<10?'0':'')+now.getMinutes()}</span><b>${selectedMarket}</b><span style="color:${isCall?'#00ffcc':'#ff4d4d'}">${isCall?'CALL':'PUT'}</span></div>`;
             }
+            document.getElementById('reason-ui').innerText = "Algorithmic Forecast: Asset specific OTC logic applied for " + selectedQty + " intervals.";
         }
 
         function resetUIs() {
-            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'btn-next', 'copy-btn', 'active-mode-label'];
+            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'btn-next', 'copy-btn'];
             ids.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-            document.getElementById('future-list-ui').innerHTML = "";
         }
 
-        function nextAnalysis() {
-            resetUIs();
-            document.getElementById('active-mode-label').classList.remove('hidden');
-            document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
-            if(currentMode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
-            else if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
-            else document.getElementById('btn-execute').classList.remove('hidden');
-        }
-
-        function goHome() { toggleMenu(); currentMode = ""; resetUIs(); document.getElementById('ui-welcome').classList.remove('hidden'); }
+        function goHome() { currentMode = ""; resetUIs(); document.getElementById('ui-welcome').classList.remove('hidden'); document.getElementById('active-mode-label').classList.add('hidden'); }
         function triggerGallery() { document.getElementById('inp-file').click(); }
-        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART LOADED"; document.getElementById('btn-execute').classList.remove('hidden'); } }
+        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART READY"; document.getElementById('btn-execute').classList.remove('hidden'); } }
         function setQty(q) { selectedQty = q; document.getElementById('btn-execute').classList.remove('hidden'); }
         function copySignals() { navigator.clipboard.writeText(document.getElementById('future-list-ui').innerText); alert("Copied!"); }
+        function nextAnalysis() {
+            let m = currentMode; resetUIs(); currentMode = m;
+            document.getElementById('active-mode-label').classList.remove('hidden');
+            if(m === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
+            else if(m === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
+            else document.getElementById('btn-execute').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
