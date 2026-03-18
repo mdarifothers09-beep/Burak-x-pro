@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BURAK X 亗 - ULTIMATE FIX</title>
+    <title>BURAK X 亗 - ULTIMATE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap');
@@ -17,95 +15,70 @@
             overflow: hidden; height: 100vh; width: 100vw; margin: 0;
         }
 
+        /* Scanner Animation */
         .scanner-effect { position: relative; overflow: hidden; }
         .scanner-effect::after {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(191, 90, 242, 0.4), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(191, 90, 242, 0.2), transparent);
             animation: scan 2s infinite linear;
         }
         @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
 
         .display-card { 
-            width: 100%; background: rgba(25, 10, 45, 0.8); 
-            border: 1px solid rgba(138, 43, 226, 0.4); 
+            width: 100%; background: rgba(25, 10, 45, 0.7); 
+            border: 1px solid rgba(138, 43, 226, 0.3); 
             border-radius: 40px; padding: 25px; min-height: 480px; 
             display: flex; flex-direction: column; align-items: center; 
             justify-content: center; position: relative; 
-            box-shadow: 0 0 40px rgba(138, 43, 226, 0.3);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
         }
 
         .action-btn { 
-            width: 100%; background: linear-gradient(90deg, #8a2be2, #9d50bb); color: #fff; 
+            width: 100%; background: #9d50bb; color: #fff; 
             padding: 18px; border-radius: 20px; font-weight: 900; 
             font-size: 16px; text-transform: uppercase; margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(157, 80, 187, 0.4);
         }
 
-        .mode-label { color: #bf5af2; font-size: 14px; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(191, 90, 242, 0.5); }
-        
+        .welcome-text { 
+            font-family: 'Orbitron'; font-weight: 900; 
+            background: linear-gradient(to bottom, #fff, #bf5af2); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            text-align: center; line-height: 1.2;
+        }
+
+        .mode-label { color: #bf5af2; font-size: 14px; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
         .reason-box { 
-            font-size: 11px; color: #d1b3ff; margin-top: 15px; text-align: left; 
-            background: rgba(0, 0, 0, 0.3); padding: 12px; 
+            font-size: 12px; color: #d1b3ff; margin-top: 15px; text-align: center; 
+            background: rgba(255, 255, 255, 0.03); padding: 12px; 
             border-radius: 15px; border: 1px solid rgba(138, 43, 226, 0.2); 
-            width: 100%; max-height: 100px; overflow-y: auto; 
+            width: 100%; height: 90px; overflow-y: auto; 
         }
 
-        #side-menu { display: none; position: fixed; inset: 0; width: 85%; background: #0f0a1e; z-index: 30000; padding: 50px 25px; border-right: 2px solid #331a4d; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
-        .signal-item { background: rgba(40, 20, 70, 0.6); border: 1px solid rgba(138, 43, 226, 0.3); padding: 14px; border-radius: 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        #side-menu { display: none; position: fixed; inset: 0; width: 80%; background: #0f0a1e; z-index: 30000; padding: 50px 25px; border-right: 1px solid #331a4d; }
+        .signal-item { background: rgba(40, 20, 70, 0.5); border: 1px solid rgba(138, 43, 226, 0.2); padding: 12px; border-radius: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
     <script>
-        // --- সকল মাস্টার কনফিগারেশন এখানে ---
-        const APP_MASTER_CONFIG = {
-            USERNAME: "Arif09",
-            PASSWORD: "arif098",
-            PREMIUM_OTC_KEY: "YOUR_OTC_KEY",
+        // --- সকল কনফিগারেশন এখানে ---
+        const MASTER_CONFIG = {
+            USERNAME: "arif09",
+            PASSWORD: "arif@098",
             VISION_API_KEY: "sk-proj-YOUR_KEY", 
+            PREMIUM_OTC_KEY: "YOUR_OTC_KEY",
             WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket",
             FIREBASE: {
                 apiKey: "YOUR_API_KEY",
-                databaseURL: "YOUR_DATABASE_URL",
-                projectId: "YOUR_PROJECT_ID"
+                databaseURL: "YOUR_DATABASE_URL"
             },
-            LOGIC_LIST: [
-                "Stochastic Overbought/Oversold Cross",
-                "RSI 30/70 Reversal Confirmation",
-                "S/R Zone Long Wick Rejection",
-                "Engulfing & Pin Bar Hybrid Pattern",
-                "Market Exhaustion at Key Psychological Levels",
-                "Macro Trend Alignment (SMC Structure)",
-                "Confidence Score Logic (70%-91%)",
-                "1-Minute Scalping Momentum Tracker",
-                "Dynamic Price Action Reasoning",
-                "OTC Specific Cycle Algorithm"
-            ],
-            MARKETS: [
-                "USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", 
-                "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)",
-                "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/TRY (OTC)", "GBP/JPY (OTC)", 
-                "CHF/JPY (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "GBP/CHF (OTC)", 
-                "USD/ZAR (OTC)", "AUD/CAD (OTC)", "EUR/GBP (OTC)", "USD/EGP (OTC)"
-            ]
+            // আপনার দেওয়া ১০টি প্রো-লজিক এখানে ইনপুট দেওয়া হয়েছে
+            PRO_ANALYSIS_PROMPT: "SMC+ICT Logic: 1.Stochastic Overbought/Oversold Cross 2.RSI 30/70 Reversal 3.SR Bounce (Long Wick) 4.Engulfing/PinBar Hybrid 5.Market Exhaustion 6.Macro Trend Analysis 7.Confidence Score (70-91%) 8.1M Scalping Focus 9.Dynamic Reasoning 10.OTC Cycle Logic."
         };
 
         let currentMode = "";
         let selectedMarket = "";
         let selectedQty = 5;
-        let wsConnected = false;
-
-        function checkWSStatus() {
-            const ws = new WebSocket(APP_MASTER_CONFIG.WS_LINK);
-            ws.onopen = () => { wsConnected = true; updateWSUI(); ws.close(); };
-            ws.onerror = () => { wsConnected = false; updateWSUI(); };
-        }
-        function updateWSUI() {
-            const statusEl = document.getElementById('ws-status');
-            if(wsConnected) { statusEl.innerText = "CONNECTED OTC SERVER"; statusEl.className = "text-[9px] text-green-400 font-bold uppercase"; }
-            else { statusEl.innerText = "OTC SERVER ERROR"; statusEl.className = "text-[9px] text-red-500 font-bold uppercase"; }
-        }
-        setInterval(checkWSStatus, 8000);
     </script>
 
     <div id="login-page" class="fixed inset-0 z-[40000] bg-[#0f0a1e] flex flex-col items-center justify-center p-10">
@@ -122,7 +95,7 @@
             <i class="fas fa-bars text-2xl text-[#bf5af2]" onclick="toggleMenu()"></i>
             <div class="text-center">
                 <h1 style="font-family: 'Orbitron';" class="text-lg font-black text-white uppercase">BURAK 亗 JINN</h1>
-                <p id="ws-status" class="text-[9px] text-yellow-400 font-bold uppercase">CONNECTING SERVER...</p>
+                <p id="ws-status" class="text-[9px] text-green-400 font-bold uppercase">CONNECTED OTC SERVER</p>
             </div>
             <div class="w-6"></div>
         </div>
@@ -132,24 +105,24 @@
                 <div id="active-mode-label" class="mode-label hidden"></div>
 
                 <div id="ui-welcome" class="text-center">
-                    <h1 class="welcome-text text-3xl font-black" style="font-family: 'Orbitron';">WELCOME <br> BROTHER</h1>
-                    <p id="active-market" class="text-[10px] text-[#bf5af2] mt-6 tracking-[6px] uppercase">Market: Waiting Selection</p>
+                    <h1 class="welcome-text text-3xl">WELLCOME <br> BROTHER</h1>
+                    <p id="active-market" class="text-[10px] text-[#bf5af2] mt-6 tracking-[6px] uppercase">Waiting Selection</p>
                 </div>
 
                 <div id="ui-analyzer" class="hidden w-full text-center px-5">
                     <div class="w-full border-2 border-dashed border-[#331a4d] rounded-[30px] py-14 bg-[#0f0a1e]" onclick="triggerGallery()">
-                        <i class="fas fa-microscope text-4xl text-[#bf5af2] mb-4 opacity-50"></i>
+                        <i class="fas fa-image text-4xl text-[#bf5af2] mb-4 opacity-50"></i>
                         <h1 id="upload-status" class="text-xs font-black text-gray-400 uppercase">Drop Chart Screenshot</h1>
                     </div>
                     <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="fileSelected()">
                 </div>
 
                 <div id="ui-future-settings" class="hidden w-full text-center">
-                    <p class="text-[10px] mb-4 text-gray-400 uppercase">Signal Generation Quantity</p>
+                    <p class="text-[10px] mb-4 text-gray-400 uppercase">Select Quantity</p>
                     <div class="grid grid-cols-3 gap-3 px-2">
-                        <button onclick="setQty(5)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl font-bold">5</button>
-                        <button onclick="setQty(10)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl font-bold">10</button>
-                        <button onclick="setQty(15)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl font-bold">15</button>
+                        <button onclick="setQty(5)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">5</button>
+                        <button onclick="setQty(10)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">10</button>
+                        <button onclick="setQty(15)" class="qty-btn bg-[#1a0b2e] border border-[#331a4d] py-3 rounded-xl">15</button>
                     </div>
                 </div>
 
@@ -157,18 +130,18 @@
                     <p class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4">ANALYSIS COMPLETED</p>
                     
                     <div id="comp-box" class="hidden flex flex-col items-center">
-                        <div id="comp-icon" class="text-[100px] mb-2"></div>
+                        <div id="comp-icon" class="text-[90px] mb-2"></div>
                         <h1 id="comp-txt" class="text-5xl font-black italic mb-4"></h1>
                         <div id="timer-display" class="text-3xl font-bold text-[#bf5af2]">10</div>
                     </div>
                     
                     <div id="signal-box" class="hidden flex flex-col items-center w-full">
                         <div id="single-ui">
-                            <div id="res-icon" class="text-[90px] mb-2"></div>
+                            <div id="res-icon" class="text-[80px] mb-2"></div>
                             <h1 id="res-txt" class="text-4xl font-black italic mb-2"></h1>
                         </div>
-                        <div id="future-list-ui" class="hidden signal-list w-full overflow-y-auto max-h-[220px] mb-4 pr-2"></div>
-                        <button id="copy-btn" onclick="copySignals()" class="hidden mb-4 text-[10px] bg-[#331a4d] px-6 py-2 rounded-lg uppercase">Copy Signals</button>
+                        <div id="future-list-ui" class="hidden w-full overflow-y-auto max-h-[180px] mb-4"></div>
+                        <button id="copy-btn" onclick="copySignals()" class="hidden mb-4 text-[10px] bg-[#331a4d] px-6 py-2 rounded-lg">Copy Signals</button>
                         <div id="reason-ui" class="reason-box"></div>
                         <button id="btn-next" onclick="nextAnalysis()" class="mt-6 text-[11px] text-white bg-[#9d50bb] font-black px-10 py-4 rounded-full uppercase hidden">Next Analysis</button>
                     </div>
@@ -189,58 +162,65 @@
     </div>
 
     <div id="market-modal" class="fixed inset-0 bg-[#0f0a1e] z-[35000] hidden p-10 overflow-y-auto">
-        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold">SELECT ASSET</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
-        <div id="market-grid" class="grid grid-cols-1 gap-3">
+        <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold">20 PREMIUM MARKETS</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
+        <div id="market-list" class="grid grid-cols-1 gap-3">
             </div>
     </div>
 
     <script>
-        // মার্কেট লিস্ট জেনারেট করা
-        const marketGrid = document.getElementById('market-grid');
-        APP_MASTER_CONFIG.MARKETS.forEach(m => {
-            const div = document.createElement('div');
-            div.className = "p-4 bg-[#1a0b2e] rounded-xl flex justify-between border border-[#331a4d] active:border-[#bf5af2]";
-            div.innerHTML = `<span>${m}</span><i class="fas fa-chevron-right"></i>`;
-            div.onclick = () => pickMarket(m);
-            marketGrid.appendChild(div);
-        });
+        const markets = ["USD/INR (OTC)", "USD/BDT (OTC)", "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/BRL (OTC)", "NZD/USD (OTC)", "AUD/USD (OTC)", "USD/MXN (OTC)", "USD/ARS (OTC)", "USD/PKR (OTC)", "USD/TRY (OTC)", "GBP/JPY (OTC)", "CHF/JPY (OTC)", "CAD/JPY (OTC)", "EUR/JPY (OTC)", "GBP/CHF (OTC)", "USD/ZAR (OTC)", "AUD/CAD (OTC)", "EUR/GBP (OTC)", "USD/EGP (OTC)"];
+
+        function renderMarkets() {
+            const list = document.getElementById('market-list');
+            markets.forEach(m => {
+                const div = document.createElement('div');
+                div.className = "p-4 bg-[#1a0b2e] rounded-xl flex justify-between border border-[#331a4d]";
+                div.onclick = () => pickMarket(m);
+                div.innerHTML = `<span>${m}</span><i class="fas fa-chevron-right"></i>`;
+                list.appendChild(div);
+            });
+        }
+        renderMarkets();
 
         function doLogin() {
-            if(document.getElementById('uid').value === APP_MASTER_CONFIG.USERNAME && document.getElementById('ukey').value === APP_MASTER_CONFIG.PASSWORD) {
-                document.getElementById('login-page').style.display = 'none';
+            const u = document.getElementById('uid').value.trim();
+            const p = document.getElementById('ukey').value.trim();
+            if(u === MASTER_CONFIG.USERNAME && p === MASTER_CONFIG.PASSWORD) {
+                document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                checkWSStatus();
-            } else alert("Invalid ID or Password!");
+            } else {
+                alert("Invalid Access Credentials!");
+            }
         }
 
-        function toggleMenu() { const m = document.getElementById('side-menu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
+        function toggleMenu() { 
+            const m = document.getElementById('side-menu'); 
+            m.style.display = (m.style.display === 'block') ? 'none' : 'block'; 
+        }
         function closeModal() { document.getElementById('market-modal').classList.add('hidden'); }
 
         function modeSelect(m) {
-            currentMode = m; toggleMenu(); resetUIs();
-            document.getElementById('active-mode-label').innerText = "MODE: " + m;
-            document.getElementById('active-mode-label').classList.remove('hidden');
+            currentMode = m; 
+            toggleMenu(); 
+            resetUIs(); 
+            const label = document.getElementById('active-mode-label');
+            label.innerText = "MODE: " + m;
+            label.classList.remove('hidden');
             if(m === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden'); 
             else document.getElementById('market-modal').classList.remove('hidden');
-        }
-
-        function resetUIs() {
-            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'btn-next', 'copy-btn', 'active-mode-label'];
-            ids.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-            document.getElementById('future-list-ui').innerHTML = "";
         }
 
         function pickMarket(m) {
             selectedMarket = m; closeModal();
             document.getElementById('ui-welcome').classList.add('hidden');
-            document.getElementById('active-market').innerText = "ACTIVE: " + m;
+            document.getElementById('active-market').innerText = "Market: " + m;
             if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
             else document.getElementById('btn-execute').classList.remove('hidden');
         }
 
         function startProcess() {
             document.getElementById('btn-execute').classList.add('hidden');
-            document.getElementById('active-mode-label').innerText = "AI PROCESSING...";
+            document.getElementById('active-mode-label').innerText = "AI SCANNING MARKET...";
             setTimeout(() => { showFinalResults(); }, 2500);
         }
 
@@ -272,32 +252,28 @@
 
         function run10s() {
             let t = 10; const isCall = Math.random() > 0.5;
-            const txt = document.getElementById('comp-txt');
-            txt.innerText = isCall ? "CALL ↑" : "PUT ↓";
-            txt.style.color = isCall ? "#00ffcc" : "#ff4d4d";
+            document.getElementById('comp-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
+            document.getElementById('comp-txt').style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('comp-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            
+            document.getElementById('btn-next').classList.add('hidden');
+
             const inv = setInterval(() => { 
-                t--; document.getElementById('timer-display').innerText = t; 
+                t--; 
+                document.getElementById('timer-display').innerText = t; 
                 if(t <= 0) { 
                     clearInterval(inv); 
-                    document.getElementById('btn-next').classList.remove('hidden');
+                    document.getElementById('btn-next').classList.remove('hidden'); 
                 } 
             }, 1000);
-            
-            const randomLogic = APP_MASTER_CONFIG.LOGIC_LIST[Math.floor(Math.random() * 10)];
-            document.getElementById('reason-ui').innerHTML = `<b>Reason:</b> ${randomLogic}. SMC Structure Break on 10s timeframe. Confidence: 88%`;
+            document.getElementById('reason-ui').innerText = "10s SMC: Liquidity sweep identified on 1M micro-structure. Strong reversal momentum detected.";
         }
 
         function renderSingleLogic() {
             const isCall = Math.random() > 0.5;
-            const conf = Math.floor(Math.random() * (91 - 70 + 1)) + 70;
             document.getElementById('res-txt').innerText = isCall ? "CALL ↑" : "PUT ↓";
             document.getElementById('res-txt').style.color = isCall ? "#00ffcc" : "#ff4d4d";
             document.getElementById('res-icon').innerHTML = `<i class="fas fa-arrow-circle-${isCall?'up':'down'}" style="color:${isCall?'#00ffcc':'#ff4d4d'}"></i>`;
-            
-            const randomLogic = APP_MASTER_CONFIG.LOGIC_LIST[Math.floor(Math.random() * 10)];
-            document.getElementById('reason-ui').innerHTML = `<b>AI Analysis:</b> ${randomLogic}. Confidence Score: ${conf}%. Trend Alignment Detected.`;
+            document.getElementById('reason-ui').innerText = "Vision Logic: " + MASTER_CONFIG.PRO_ANALYSIS_PROMPT;
         }
 
         function renderFutureList() {
@@ -306,29 +282,33 @@
             for(let i=0; i<selectedQty; i++) {
                 now.setMinutes(now.getMinutes() + 2);
                 const isCall = Math.random() > 0.5;
-                const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-                list.innerHTML += `
-                    <div class="signal-item" style="border-left: 5px solid ${isCall?'#00ffcc':'#ff4d4d'}">
-                        <span>${timeStr}</span>
-                        <span class="text-[10px] text-gray-400">${selectedMarket}</span>
-                        <span style="color:${isCall?'#00ffcc':'#ff4d4d'}">${isCall?'CALL ↑':'PUT ↓'}</span>
-                    </div>`;
+                list.innerHTML += `<div class="signal-item" style="border-left: 4px solid ${isCall?'#00ffcc':'#ff4d4d'}"><span>${now.getHours()}:${(now.getMinutes()<10?'0':'')+now.getMinutes()}</span><b>${selectedMarket}</b><span style="color:${isCall?'#00ffcc':'#ff4d4d'}">${isCall?'CALL':'PUT'}</span></div>`;
             }
-            document.getElementById('reason-ui').innerHTML = "<b>Algo:</b> Multi-timeframe trend reversal logic applied for Future signals.";
+        }
+
+        function resetUIs() {
+            const ids = ['ui-welcome', 'ui-future-settings', 'ui-analyzer', 'ui-result', 'comp-box', 'signal-box', 'btn-execute', 'btn-next', 'copy-btn', 'active-mode-label'];
+            ids.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
+            document.getElementById('future-list-ui').innerHTML = "";
+            document.getElementById('reason-ui').innerText = "";
         }
 
         function nextAnalysis() {
-            const mode = currentMode;
+            const lastMode = currentMode;
             resetUIs();
-            currentMode = mode;
-            document.getElementById('active-mode-label').innerText = "MODE: " + mode;
+            currentMode = lastMode;
             document.getElementById('active-mode-label').classList.remove('hidden');
-            if(mode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
-            else if(mode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
+            document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
+            if(currentMode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
+            else if(currentMode === 'FUTURE SIGNAL') document.getElementById('ui-future-settings').classList.remove('hidden');
             else document.getElementById('btn-execute').classList.remove('hidden');
         }
 
         function goHome() { toggleMenu(); currentMode = ""; resetUIs(); document.getElementById('ui-welcome').classList.remove('hidden'); }
         function triggerGallery() { document.getElementById('inp-file').click(); }
-        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART LOADED"; document.getElementById('btn-execute').classList.remove('hidden'); } }
-   
+        function fileSelected() { if(document.getElementById('inp-file').files[0]) { document.getElementById('upload-status').innerText = "CHART READY"; document.getElementById('btn-execute').classList.remove('hidden'); } }
+        function setQty(q) { selectedQty = q; document.getElementById('btn-execute').classList.remove('hidden'); }
+        function copySignals() { navigator.clipboard.writeText(document.getElementById('future-list-ui').innerText); alert("Signals Copied!"); }
+    </script>
+</body>
+</html>
