@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BURAK X 亗 - ULTIMATE EDITION</title>
+    <title>BURAK X 亗 - ULTIMATE FIREBASE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap');
@@ -15,7 +17,6 @@
             overflow: hidden; height: 100vh; width: 100vw; margin: 0;
         }
 
-        /* Scanner Animation */
         .scanner-effect { position: relative; overflow: hidden; }
         .scanner-effect::after {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
@@ -61,19 +62,26 @@
 <body>
 
     <script>
-        // --- সকল কনফিগারেশন এখানে ---
+        // --- MASTER FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnZTZLWJcmGBlflLRXz1LFdHSv-kwE29o",
+            authDomain: "burak-x-ai.firebaseapp.com",
+            databaseURL: "https://burak-x-ai-default-rtdb.firebaseio.com",
+            projectId: "burak-x-ai",
+            storageBucket: "burak-x-ai.firebasestorage.app",
+            messagingSenderId: "1012158831215",
+            appId: "1:1012158831215"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const MASTER_CONFIG = {
-            USERNAME: "arif09",
-            PASSWORD: "arif@098",
-            VISION_API_KEY: "sk-proj-YOUR_KEY", 
+            VISION_API_KEY: "", // এখানে আপনার আসল key বসাবেন
             PREMIUM_OTC_KEY: "YOUR_OTC_KEY",
             WS_LINK: "wss://ws2.qx.trade/socket.io/?EIO=4&transport=websocket",
-            FIREBASE: {
-                apiKey: "YOUR_API_KEY",
-                databaseURL: "YOUR_DATABASE_URL"
-            },
-            // আপনার দেওয়া ১০টি প্রো-লজিক এখানে ইনপুট দেওয়া হয়েছে
-            PRO_ANALYSIS_PROMPT: "SMC+ICT Logic: 1.Stochastic Overbought/Oversold Cross 2.RSI 30/70 Reversal 3.SR Bounce (Long Wick) 4.Engulfing/PinBar Hybrid 5.Market Exhaustion 6.Macro Trend Analysis 7.Confidence Score (70-91%) 8.1M Scalping Focus 9.Dynamic Reasoning 10.OTC Cycle Logic."
+            PRO_ANALYSIS_PROMPT: "SMC+ICT Logic: 1.Stochastic Cross 2.RSI Reversal 3.SR Bounce 4.PinBar Hybrid 5.Market Exhaustion 6.Macro Trend 7.Confidence Score (70-91%) 8.1M Scalping 9.Dynamic Reasoning 10.OTC Cycle."
         };
 
         let currentMode = "";
@@ -127,7 +135,7 @@
                 </div>
 
                 <div id="ui-result" class="hidden flex flex-col items-center text-center w-full">
-                    <p class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4">ANALYSIS COMPLETED</p>
+                    <p id="analysis-text" class="text-[#00ffcc] text-[10px] font-bold tracking-widest mb-4">ANALYSIS COMPLETED</p>
                     
                     <div id="comp-box" class="hidden flex flex-col items-center">
                         <div id="comp-icon" class="text-[90px] mb-2"></div>
@@ -163,8 +171,7 @@
 
     <div id="market-modal" class="fixed inset-0 bg-[#0f0a1e] z-[35000] hidden p-10 overflow-y-auto">
         <div class="flex justify-between items-center mb-10 text-[#bf5af2]"><h2 class="text-xl font-bold">20 PREMIUM MARKETS</h2><i class="fas fa-times text-2xl" onclick="closeModal()"></i></div>
-        <div id="market-list" class="grid grid-cols-1 gap-3">
-            </div>
+        <div id="market-list" class="grid grid-cols-1 gap-3"></div>
     </div>
 
     <script>
@@ -182,15 +189,26 @@
         }
         renderMarkets();
 
+        // --- FIREBASE LOGIN LOGIC ---
         function doLogin() {
             const u = document.getElementById('uid').value.trim();
             const p = document.getElementById('ukey').value.trim();
-            if(u === MASTER_CONFIG.USERNAME && p === MASTER_CONFIG.PASSWORD) {
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-            } else {
-                alert("Invalid Access Credentials!");
-            }
+            if(!u || !p) return alert("Enter ID & Password");
+
+            database.ref('users/' + u).once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if(data.status === "blocked") return alert("Your account is BLOCKED!");
+                    if(data.password === p) {
+                        document.getElementById('login-page').classList.add('hidden');
+                        document.getElementById('main-app').classList.remove('hidden');
+                    } else {
+                        alert("Wrong Password!");
+                    }
+                } else {
+                    alert("User ID not found in Database!");
+                }
+            });
         }
 
         function toggleMenu() { 
@@ -200,9 +218,7 @@
         function closeModal() { document.getElementById('market-modal').classList.add('hidden'); }
 
         function modeSelect(m) {
-            currentMode = m; 
-            toggleMenu(); 
-            resetUIs(); 
+            currentMode = m; toggleMenu(); resetUIs(); 
             const label = document.getElementById('active-mode-label');
             label.innerText = "MODE: " + m;
             label.classList.remove('hidden');
@@ -219,6 +235,12 @@
         }
 
         function startProcess() {
+            // API KEY CHECK (API ছাড়া সিগনাল বন্ধ)
+            if(!MASTER_CONFIG.VISION_API_KEY || MASTER_CONFIG.VISION_API_KEY === "" || MASTER_CONFIG.VISION_API_KEY.length < 10) {
+                alert("ERROR: Vision API Key is missing or invalid. Analysis cannot proceed.");
+                return;
+            }
+
             document.getElementById('btn-execute').classList.add('hidden');
             document.getElementById('active-mode-label').innerText = "AI SCANNING MARKET...";
             setTimeout(() => { showFinalResults(); }, 2500);
@@ -258,14 +280,10 @@
             document.getElementById('btn-next').classList.add('hidden');
 
             const inv = setInterval(() => { 
-                t--; 
-                document.getElementById('timer-display').innerText = t; 
-                if(t <= 0) { 
-                    clearInterval(inv); 
-                    document.getElementById('btn-next').classList.remove('hidden'); 
-                } 
+                t--; document.getElementById('timer-display').innerText = t; 
+                if(t <= 0) { clearInterval(inv); document.getElementById('btn-next').classList.remove('hidden'); } 
             }, 1000);
-            document.getElementById('reason-ui').innerText = "10s SMC: Liquidity sweep identified on 1M micro-structure. Strong reversal momentum detected.";
+            document.getElementById('reason-ui').innerText = "10s SMC Logic: Micro-liquidity scan completed. Bullish/Bearish momentum aligned.";
         }
 
         function renderSingleLogic() {
@@ -294,9 +312,7 @@
         }
 
         function nextAnalysis() {
-            const lastMode = currentMode;
-            resetUIs();
-            currentMode = lastMode;
+            const lastMode = currentMode; resetUIs(); currentMode = lastMode;
             document.getElementById('active-mode-label').classList.remove('hidden');
             document.getElementById('active-mode-label').innerText = "MODE: " + currentMode;
             if(currentMode === 'LIVE ANALYZER') document.getElementById('ui-analyzer').classList.remove('hidden');
